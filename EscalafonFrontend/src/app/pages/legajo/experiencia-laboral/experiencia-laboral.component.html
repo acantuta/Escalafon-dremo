@@ -1,0 +1,221 @@
+<!-- Reemplazamos la información del empleado con el componente servidor-publico -->
+<app-servidor-publico></app-servidor-publico>
+
+<!-- Título y subtítulo -->
+<div class="mt-4">
+  <!-- Tab bar específico de Experiencia Laboral -->
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="text-600">Experiencia Laboral</span>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+  <h2 class="font-bold mb-4">Registro de experiencia Laboral</h2>
+</div>
+
+<!-- Tabla de experiencia laboral con scroll horizontal en móviles -->
+<div class="mb-6 overflow-x-auto">
+  <table mat-table [dataSource]="dataSource" class="w-full min-w-[800px]">
+    <!-- Columna N° -->
+    <ng-container matColumnDef="nro">
+      <th mat-header-cell *matHeaderCellDef class="w-12"> N° </th>
+      <td mat-cell *matCellDef="let i = index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Columna Sector -->
+    <ng-container matColumnDef="sector">
+      <th mat-header-cell *matHeaderCellDef> Sector </th>
+      <td mat-cell *matCellDef="let element"> {{element.cExpLabSecNombre}} </td>
+    </ng-container>
+
+    <!-- Columna Entidad -->
+    <ng-container matColumnDef="entidad">
+      <th mat-header-cell *matHeaderCellDef> Entidad </th>
+      <td mat-cell *matCellDef="let element"> {{element.cExpLabEntidad}} </td>
+    </ng-container>
+
+    <!-- Columna Cargo -->
+    <ng-container matColumnDef="cargo">
+      <th mat-header-cell *matHeaderCellDef> Cargo </th>
+      <td mat-cell *matCellDef="let element"> {{element.cExpLabCargo}} </td>
+    </ng-container>
+
+    <!-- Columna Funciones -->
+    <ng-container matColumnDef="funciones">
+      <th mat-header-cell *matHeaderCellDef> Funciones Desempeñadas </th>
+      <td mat-cell *matCellDef="let element"> {{element.cExpLabFuncionesDesempenadas}} </td>
+    </ng-container>
+
+    <!-- Columna F. Inicio -->
+    <ng-container matColumnDef="fInicio">
+      <th mat-header-cell *matHeaderCellDef> F. Inicio </th>
+      <td mat-cell *matCellDef="let element"> {{element.dtExpLabFechaInicio | date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+
+    <!-- Columna F. Fin -->
+    <ng-container matColumnDef="fFin">
+      <th mat-header-cell *matHeaderCellDef> F. Fin </th>
+      <td mat-cell *matCellDef="let element"> {{element.dtExpLabFechaFin | date:'dd/MM/yyyy'}} </td>
+    </ng-container>
+
+    <!-- Columna Documento -->
+    <ng-container matColumnDef="documento">
+      <th mat-header-cell *matHeaderCellDef> Documento </th>
+      <td mat-cell *matCellDef="let element"> {{element.cExpLabNumeroDocumento}} </td>
+    </ng-container>
+
+    <!-- Columna Acciones -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button (click)="editarExperiencia(row)" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="eliminarExperiencia(row)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button (click)="verRegistro(row)" matTooltip="Ver">
+          <mat-icon>visibility</mat-icon>
+        </button>
+
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Seleccionar página">
+  </mat-paginator>
+</div>
+
+<!-- Formulario de experiencia laboral -->
+<form [formGroup]="form" class="p-4 border rounded-lg">
+  <h3 class="text-lg font-medium mb-4">
+    {{ modoVisualizacion ? 'Visualización de experiencia laboral' :
+    modoEdicion ? 'Edición de experiencia laboral' :
+    'Registro de experiencia laboral' }}
+  </h3>
+
+  <!-- Selector de sector con diseño responsivo -->
+  <div class="mb-4">
+    <label class="block mb-2">Sector:</label>
+    <mat-radio-group formControlName="iExpLabSecId" class="flex flex-wrap gap-4">
+      <mat-radio-button *ngFor="let sector of sectores" [value]="sector.iExpLabSecId">
+        {{ sector.cExpLabSecNombre }}
+      </mat-radio-button>
+    </mat-radio-group>
+    <!-- Mensaje de error para el sector -->
+    <mat-error *ngIf="form.get('iExpLabSecId')?.hasError('required') && form.get('iExpLabSecId')?.touched" class="mt-1">
+      El sector es requerido
+    </mat-error>
+  </div>
+
+  <!-- Campos del formulario -->
+  <!-- Primera fila: Entidad y Cargo -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <mat-form-field>
+      <mat-label>Entidad</mat-label>
+      <input matInput formControlName="cExpLabEntidad" uppercase>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Cargo</mat-label>
+      <input matInput formControlName="cExpLabCargo" uppercase>
+    </mat-form-field>
+  </div>
+
+  <!-- Segunda fila: Número y fecha de documento -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <mat-form-field>
+      <mat-label>Número de documento</mat-label>
+      <input matInput formControlName="cExpLabNumeroDocumento" uppercase>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Fecha de documento</mat-label>
+      <input matInput [matDatepicker]="pickerDoc" formControlName="dtExpLabFechaDocumento">
+      <mat-datepicker-toggle matSuffix [for]="pickerDoc"></mat-datepicker-toggle>
+      <mat-datepicker #pickerDoc></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <!-- Tercera fila: Fechas inicio y fin -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <mat-form-field>
+      <mat-label>Fecha de inicio</mat-label>
+      <input matInput [matDatepicker]="pickerInicio" formControlName="dtExpLabFechaInicio">
+      <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+      <mat-datepicker #pickerInicio></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Fecha fin</mat-label>
+      <input matInput [matDatepicker]="pickerFin" formControlName="dtExpLabFechaFin">
+      <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFin></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <!-- Cuarta fila: Funciones desempeñadas -->
+  <div class="mb-4">
+    <mat-form-field class="w-full">
+      <mat-label>Funciones desempeñadas</mat-label>
+      <textarea matInput rows="3" formControlName="cExpLabFuncionesDesempenadas" uppercase></textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- Sexta fila: Documento -->
+  <div class="border rounded p-4 mb-4">
+    <h4 class="text-md font-medium mb-4">Documento</h4>
+    <app-archivo-handler 
+      [archivoId]="form.get('iArchId')?.value" 
+      (archivo)="onArchivoSelected($event)"
+      [containerClass]="'w-full'">
+    </app-archivo-handler>
+    <mat-error *ngIf="form.get('iArchId')?.hasError('required') && form.get('iArchId')?.touched">
+      El documento es requerido
+    </mat-error>
+  </div>
+
+  <!-- Botones de acción con diseño responsivo -->
+  <div class="flex flex-col sm:flex-row justify-between gap-4 mt-4">
+    <!-- En modo visualización solo mostrar botón cerrar -->
+    <div *ngIf="modoVisualizacion" class="flex justify-end w-full">
+      <button mat-stroked-button 
+              class="flex items-center gap-2"
+              (click)="limpiarFormulario()">
+        <mat-icon>close</mat-icon>
+        <span>CERRAR</span>
+      </button>
+    </div>
+
+    <!-- Botones normales cuando no es modo visualización -->
+    <ng-container *ngIf="!modoVisualizacion">
+      <button mat-stroked-button color="basic" 
+              class="flex items-center gap-2 w-full sm:w-auto justify-center" 
+              routerLink="legajo/principal">
+        <mat-icon>arrow_back</mat-icon>
+        <span>RETORNAR</span>
+      </button>
+
+      <div class="flex gap-2 flex-col sm:flex-row w-full sm:w-auto">
+        <button mat-stroked-button color="basic" 
+                class="flex items-center gap-2 justify-center" 
+                (click)="limpiarFormulario()">
+          <mat-icon>cleaning_services</mat-icon>
+          <span>LIMPIAR</span>
+        </button>
+
+        <button mat-raised-button color="primary" 
+                class="flex items-center gap-2 justify-center" 
+                (click)="guardar()">
+          <mat-icon>save</mat-icon>
+          <span>{{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}</span>
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</form>

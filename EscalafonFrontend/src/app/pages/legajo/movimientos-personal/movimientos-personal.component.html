@@ -1,0 +1,264 @@
+<div class="p-4" [formGroup]="vacacionForm">
+  <!-- Reemplazamos la información del empleado con el componente servidor-publico -->
+  <app-servidor-publico></app-servidor-publico>
+
+  <!-- Tab-bar -->
+  <mat-tab-group class="mt-4">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="text-600">Movimientos del personal</span>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Tabla de registros con scroll horizontal en móviles -->
+  <div class="bg-white rounded-lg p-4 mb-4 overflow-x-auto">
+    <h4 class="text-lg font-medium mb-4">Registros de movimientos de personal</h4>
+    <table mat-table [dataSource]="dataSource" class="w-full min-w-[900px]">
+      <!-- Columna N° -->
+      <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef> N° </th>
+        <td mat-cell *matCellDef="let i = index"> 
+          {{i + 1 + (paginaActual * tamanioPagina)}} 
+        </td>
+      </ng-container>
+
+      <!-- Columna Acción -->
+      <ng-container matColumnDef="accion">
+        <th mat-header-cell *matHeaderCellDef> ACCIÓN </th>
+        <td mat-cell *matCellDef="let item"> {{item.cMovAccNombre}} </td>
+      </ng-container>
+
+      <!-- Columna Motivo -->
+      <ng-container matColumnDef="motivo">
+        <th mat-header-cell *matHeaderCellDef> MOTIVO </th>
+        <td mat-cell *matCellDef="let item"> {{item.cMovMotNombre}} </td>
+      </ng-container>
+
+      <!-- Columna regimen -->
+      <ng-container matColumnDef="REGIMEN">
+        <th mat-header-cell *matHeaderCellDef> REGIMEN </th>
+        <td mat-cell *matCellDef="let item"> {{item.cRegLabNombre}} </td>
+      </ng-container>
+
+      <!-- Columna F. Inicio -->
+      <ng-container matColumnDef="fInicio">
+        <th mat-header-cell *matHeaderCellDef> F. INICIO </th>
+        <td mat-cell *matCellDef="let item"> {{item.dtVacLicFechaInicio | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <!-- Columna F. Fin -->
+      <ng-container matColumnDef="fFin">
+        <th mat-header-cell *matHeaderCellDef> F. FIN </th>
+        <td mat-cell *matCellDef="let item"> {{item.dtVacLicFechaFin | date:'dd/MM/yyyy'}} </td>
+      </ng-container>
+
+      <!-- Columna Documento -->
+      <ng-container matColumnDef="documento">
+        <th mat-header-cell *matHeaderCellDef> DOCUMENTO </th>
+        <td mat-cell *matCellDef="let item"> {{item.cVacLicNumeroDocumento}} </td>
+      </ng-container>
+
+      <!-- Columna Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="w-[120px]"> ACCIONES </th>
+        <td mat-cell *matCellDef="let row" class="w-[120px]">
+          <div class="flex flex-row items-center justify-start gap-1 min-w-[120px]">
+            <button mat-icon-button (click)="editarRegistro(row)" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button (click)="eliminarRegistro(row)" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button (click)="verRegistro(row)" matTooltip="Ver">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <!-- Mensaje cuando no hay datos -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell text-center py-4" colspan="8">
+          No se encontraron registros de movimientos de personal
+        </td>
+      </tr>
+    </table>
+
+    <!-- Paginador -->
+    <mat-paginator 
+      [length]="totalRegistros"
+      [pageSize]="tamanioPagina"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      showFirstLastButtons
+      aria-label="Seleccionar página">
+    </mat-paginator>
+  </div>
+
+  <!-- Datos principales del documento -->
+  <div class="bg-white rounded-lg p-4 mb-4">
+    <h2 class="text-lg font-medium mb-4">
+      {{ modoVisualizacion ? 'Visualización de documento' : 
+          modoEdicion ? 'Edición de documento' : 
+          'Datos principales del documento' }}
+    </h2>
+    <!-- Grid responsivo para los campos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <mat-form-field>
+        <mat-label>Tipo de documento</mat-label>
+        <mat-select formControlName="iTipoDocId">
+          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+            {{ tipo.cTipoDocNombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="validarCampo('iTipoDocId')">
+          El tipo de documento es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Número de documento</mat-label>
+        <input matInput formControlName="cVacLicNumeroDocumento" uppercase>
+        <mat-error *ngIf="validarCampo('cVacLicNumeroDocumento')">
+          El número de documento es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Fecha de documento</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dtVacLicFechaDocumento">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Sección de archivo -->
+    <div class="grid grid-cols-1 gap-4 mb-4">
+      <div class="w-full">
+        <app-archivo-handler
+          [containerClass]="'w-full'"
+          (archivo)="onArchivoSelected($event)"
+          (iArchId)="onArchivoIdSelected($event)"
+          [class.error]="validarCampo('iArchId')"
+          [archivoId]="vacacionForm.get('iArchId')?.value">
+        </app-archivo-handler>
+        <mat-error *ngIf="validarCampo('iArchId')" class="text-red-500 text-sm mt-1">
+          El archivo es requerido
+        </mat-error>
+      </div>
+    </div>
+
+    <!-- Grid responsivo para los campos de régimen, acción y motivo -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <mat-form-field>
+        <mat-label>Régimen laboral</mat-label>
+        <mat-select formControlName="iRegLabId">
+          <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+            {{ regimen.cRegLabNombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="validarCampo('iRegLabId')">
+          El régimen laboral es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Acción</mat-label>
+        <mat-select formControlName="iMovAccId">
+          <mat-option *ngFor="let accion of movimientosAccion" [value]="accion.iMovAccId">
+            {{ accion.cMovAccNombre }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="validarCampo('iMovAccId')">
+          La acción es requerida
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Motivo de acción</mat-label>
+        <mat-select formControlName="iMovMotId" [disabled]="!selectedAccionId">
+          <mat-option *ngFor="let motivo of motivosAccion" [value]="motivo.iMovMotId">
+            {{ motivo.cMovMotNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Detalle del documento -->
+  <div class="bg-white rounded-lg p-4 mb-4">
+    <h2 class="text-lg font-medium mb-4">Detalle del documento</h2>
+    <!-- Grid responsivo para fechas y cantidad de días -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <mat-form-field>
+        <mat-label>Fecha de inicio</mat-label>
+        <input matInput [matDatepicker]="pickerInicio" formControlName="dtVacLicFechaInicio">
+        <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+        <mat-datepicker #pickerInicio></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Fecha fin</mat-label>
+        <input matInput [matDatepicker]="pickerFin" formControlName="dtVacLicFechaFin">
+        <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFin></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Cantidad de días</mat-label>
+        <input matInput type="number" formControlName="cantidadDias" readonly>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="w-full">
+      <mat-label>Anotaciones</mat-label>
+      <textarea matInput rows="4" formControlName="cVacLicAnotaciones" uppercase></textarea>
+    </mat-form-field>
+  </div>
+
+  <!-- Botones con diseño responsivo -->
+  <div class="flex flex-col sm:flex-row justify-between gap-4 mt-4">
+    <button mat-stroked-button color="basic" type="button" 
+            class="flex items-center gap-2 w-full sm:w-auto justify-center" 
+            routerLink="legajo/principal">
+      <mat-icon>arrow_back</mat-icon>
+      <span>RETORNAR</span>
+    </button>
+
+    <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <!-- Botones para modo edición/creación -->
+      <ng-container *ngIf="!modoVisualizacion">
+        <button mat-stroked-button color="basic" type="button" 
+                class="flex items-center gap-2 justify-center" 
+                (click)="limpiar()">
+          <mat-icon>cleaning_services</mat-icon>
+          <span>LIMPIAR</span>
+        </button>
+
+        <button mat-raised-button color="primary" type="button"
+                class="flex items-center gap-2 justify-center" 
+                (click)="guardarRegistro()">
+          <mat-icon>save</mat-icon>
+          <span>{{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}</span>
+        </button>
+      </ng-container>
+
+      <!-- Botón de cerrar para modo visualización -->
+      <ng-container *ngIf="modoVisualizacion">
+        <button mat-stroked-button color="basic" type="button" 
+                class="flex items-center gap-2 justify-center w-full sm:w-auto" 
+                (click)="limpiar()">
+          <mat-icon>close</mat-icon>
+          <span>CERRAR</span>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+
+
+

@@ -1,0 +1,16 @@
+<div class="error-dialog">
+    <h2 mat-dialog-title class="error-title">
+      <mat-icon color="warn">error</mat-icon>
+      Error
+    </h2>
+    
+    <mat-dialog-content>
+      <p class="error-message">{{data.message}}</p>
+      <p class="error-details" *ngIf="data.details">{{data.details}}</p>
+      <p class="error-status" *ngIf="data.status">Código de error: {{data.status}}</p>
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="close()">Cerrar</button>
+    </mat-dialog-actions>
+  </div>

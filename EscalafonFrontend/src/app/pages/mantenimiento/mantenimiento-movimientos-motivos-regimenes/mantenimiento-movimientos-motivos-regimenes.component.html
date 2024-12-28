@@ -1,0 +1,40 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Movimientos Acciones Motivos Regímenes',
+    vista: {
+      nombre: 'esc.V_MantenimientoMovimientosAccionesMotivosRegimenes',
+      columnas: [
+        { campo: 'iMovAccMotRegId', label: 'ID', orden: 1 },
+   { campo: 'cMovMotNombre', label: 'Motivo', orden: 2 },
+        { campo: 'cMovAccNombre', label: 'Acción', orden: 3 },
+        { campo: 'cRegLabNombre', label: 'Régimen Laboral', orden: 4 }
+      ]
+    },
+    tabla: 'esc.movimientos_acciones_motivos_regimenes',
+    dependencias: [
+      {
+        campo: 'iMovMotId',
+        tabla: 'esc.movimientos_motivos',
+        campoClave: 'iMovMotId',
+        campoMostrar: 'cMovMotNombre'
+      },
+      {
+        campo: 'iMovAccId',
+        tabla: 'esc.movimientos_acciones',
+        campoClave: 'iMovAccId',
+        campoMostrar: 'cMovAccNombre'
+      },
+      {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      iMovAccMotRegId: 'ID',
+      iMovMotId: 'Motivo',
+      iMovAccId: 'Acción',
+      iRegLabId: 'Régimen Laboral'
+    }
+  }">
+  </mantenimiento-dinamico-component>

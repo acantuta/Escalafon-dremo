@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Movimientos Acciones',
+    vista: {
+      nombre: 'esc.V_MantenimientoMovimientosAcciones',
+      columnas: [
+        { campo: 'iMovAccId', label: 'ID', orden: 1 },
+        { campo: 'cRegLabNombre', label: 'Régimen Laboral', orden:2},
+        { campo: 'cMovAccNombre', label: 'Nombre', orden: 3 }
+      ]
+    },
+    tabla: 'esc.movimientos_acciones',
+    dependencias: [
+          {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      iMovAccId: 'ID',
+      iRegLabId: 'Régimen Laboral',
+      cMovAccNombre: 'Nombre de la Acción'
+    }
+  }">
+  </mantenimiento-dinamico-component>

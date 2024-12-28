@@ -1,0 +1,390 @@
+<!-- Mostrar loading spinner -->
+<div *ngIf="loading" class="flex justify-center p-4">
+    <mat-spinner></mat-spinner>
+</div>
+
+<!-- Mostrar mensaje de error si existe -->
+<div *ngIf="error" class="p-4 bg-red-100 text-red-700 rounded">
+    {{ error }}
+</div>
+
+<!-- Contenido principal cuando hay datos -->
+<div *ngIf="!loading && !error && legajo">
+    <!-- Reemplazamos el encabezado anterior por el componente servidor-publico -->
+    <app-servidor-publico></app-servidor-publico>
+
+    <!-- Pestañas de navegación -->
+    <mat-tab-group class="mt-4">
+        <mat-tab label="Datos personales">
+            <div class="p-2 sm:p-4">
+                <form [formGroup]="informacionPersonalForm">
+                    <!-- Datos personales -->
+                    <div class="border rounded-lg p-3 sm:p-4">
+                        <h2 class="text-lg font-medium mb-4">Datos personales</h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                            <!-- Columna 1 -->
+                            <div>
+                                <mat-form-field class="w-full">
+                                    <mat-label>Documento de identidad</mat-label>
+                                    <input matInput formControlName="cLegNumeroDocumentoIdentida" uppercase>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-full">
+                                    <mat-label>Nombres</mat-label>
+                                    <input matInput formControlName="cLegNombres" uppercase>
+                                </mat-form-field>
+
+                                <!-- Estado Civil -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>Estado Civil</mat-label>
+                                    <mat-select formControlName="iTipoEstCivId">
+                                        <mat-option *ngFor="let estado of estadosCiviles" [value]="estado.iTipoEstCivId">
+                                            {{ estado.cTipoEstCivilNombre }}
+                                        </mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="informacionPersonalForm.get('iTipoEstCivId')?.hasError('required')">
+                                        El estado civil es requerido
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- Columna 2 -->
+                            <div>
+                                <mat-form-field class="w-full">
+                                    <mat-label>Primer apellido</mat-label>
+                                    <input matInput formControlName="cLegPrimerApellido" uppercase>
+                                </mat-form-field>
+
+                                <mat-form-field class="w-full">
+                                    <mat-label>Segundo apellido</mat-label>
+                                    <input matInput formControlName="cLegSegundoApellido" uppercase>
+                                </mat-form-field>
+
+                                <!-- Sexo -->
+                                <mat-form-field class="w-full">
+                                    <mat-label>Sexo</mat-label>
+                                    <mat-select formControlName="cLegSexo">
+                                        <mat-option value="M">MASCULINO</mat-option>
+                                        <mat-option value="F">FEMENINO</mat-option>
+                                        <mat-option value="O">OTROS</mat-option>
+                                    </mat-select>
+                                    <mat-error *ngIf="informacionPersonalForm.get('cLegSexo')?.hasError('required')">
+                                        El sexo es requerido
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- Columna 3: Foto -->
+                            <div class="flex flex-col items-center">
+                                <div class="w-32 h-40 bg-gray-200 rounded overflow-hidden relative">
+                                    <img *ngIf="fotoUrl" [src]="fotoUrl + (token ? '?token=' + token : '')" 
+                                         class="w-full h-full object-cover absolute inset-0"
+                                         alt="Foto del servidor público">
+                                    <p *ngIf="!fotoUrl" class="text-center text-sm absolute inset-0 flex items-center justify-center">
+                                        Subir foto
+                                    </p>
+                                </div>
+                                <app-archivo-handler
+                                    [maxFileSize]="5"
+                                    [allowedExtensions]="['.jpg', '.jpeg', '.png']"
+                                    [required]="false"
+                                    [archivoId]="legajo?.iArchIdFoto || null"
+                                    (archivoSeleccionado)="onArchivoFotoSelected($event)"
+                                    (iArchId)="onArchivoFotoIdChange($event)"
+                                    (fileUrlChange)="fotoUrl = $event"
+                                    containerClass="w-full mt-2"
+                                    [showFolios]="false"
+                                ></app-archivo-handler>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dirección principal -->
+                    <div class="border rounded-lg p-3 sm:p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Dirección principal</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                            <!-- Dirección -->
+                            <mat-form-field class="w-full sm:col-span-2 lg:col-span-3">
+                                <mat-label>Dirección</mat-label>
+                                <input matInput formControlName="cLegDireccion" uppercase>
+                            </mat-form-field>
+
+                            <!-- Departamento -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Departamento</mat-label>
+                                <mat-select formControlName="iDptoIdDireccion" 
+                                           [compareWith]="compareDepartamento"
+                                           (selectionChange)="onDepartamentoDireccionChange($event)">
+                                    <mat-option *ngFor="let dpto of departamentos" 
+                                               [value]="dpto.iDptoId">
+                                        {{ dpto.cDptoNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Provincia -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Provincia</mat-label>
+                                <mat-select formControlName="iPrvnIdDireccion" 
+                                           [compareWith]="compareProvincia"
+                                           (selectionChange)="onProvinciaDireccionChange($event)">
+                                    <mat-option *ngFor="let prov of provincias" 
+                                               [value]="prov.iPrvnId">
+                                        {{ prov.cPrvnNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Distrito -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Distrito</mat-label>
+                                <mat-select formControlName="iDsttIdDireccion"
+                                            [compareWith]="compareDistrito">
+                                    <mat-option *ngFor="let dist of distritos" 
+                                               [value]="dist.iDsttId">
+                                        {{ dist.cDsttNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Fecha y lugar de nacimiento -->
+                    <div class="bg-white rounded-lg p-4 mb-4">
+                        <h2 class="text-lg font-medium mb-4">Fecha y lugar de nacimiento</h2>
+
+                        <div class="grid grid-cols-5 gap-4">
+                            <!-- Fecha de nacimiento -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Fecha de nacimiento</mat-label>
+                                <input matInput [matDatepicker]="fechaNacimientoPicker" formControlName="dtLegFechaNacimiento">
+                                <mat-datepicker-toggle matSuffix [for]="fechaNacimientoPicker"></mat-datepicker-toggle>
+                                <mat-datepicker #fechaNacimientoPicker></mat-datepicker>
+                            </mat-form-field>
+
+                            <!-- País -->
+                            <mat-form-field class="w-full">
+                                <mat-label>País</mat-label>
+                                <mat-select formControlName="iPaisIdNacimiento">
+                                    <mat-option *ngFor="let pais of paises" [value]="pais.iPaisId">
+                                        {{ pais.cPaisNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Departamento de nacimiento -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Departamento</mat-label>
+                                <mat-select formControlName="iDptoIdNacimiento" 
+                                           [compareWith]="compareDepartamento"
+                                           (selectionChange)="onDepartamentoNacimientoChange($event)">
+                                    <mat-option *ngFor="let dpto of departamentos" 
+                                               [value]="dpto.iDptoId">
+                                        {{ dpto.cDptoNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Provincia de nacimiento -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Provincia</mat-label>
+                                <mat-select formControlName="iPrvnIdNacimiento" 
+                                           [compareWith]="compareProvincia"
+                                           (selectionChange)="onProvinciaNacimientoChange($event)">
+                                    <mat-option *ngFor="let prov of provinciasNacimiento" 
+                                               [value]="prov.iPrvnId">
+                                        {{ prov.cPrvnNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <!-- Distrito de nacimiento -->
+                            <mat-form-field class="w-full">
+                                <mat-label>Distrito</mat-label>
+                                <mat-select formControlName="iDsttIdNacimiento"
+                                            [compareWith]="compareDistrito">
+                                    <mat-option *ngFor="let dist of distritosNacimiento" 
+                                               [value]="dist.iDsttId">
+                                        {{ dist.cDsttNombre }}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Fallecido -->
+                    <div class="border rounded-lg p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Fallecido</h2>
+
+                        <div class="w-1/3">
+                            <mat-form-field class="w-full">
+                                <mat-label>Fecha de fallecimiento</mat-label>
+                                <input matInput [matDatepicker]="fallecimientoPicker" 
+                                       formControlName="dtLegFechaFallecido">
+                                <mat-datepicker-toggle matSuffix [for]="fallecimientoPicker"></mat-datepicker-toggle>
+                                <mat-datepicker #fallecimientoPicker></mat-datepicker>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Datos de contacto -->
+                    <div class="border rounded-lg p-3 sm:p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Datos de contacto</h2>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <mat-form-field class="w-full">
+                                <mat-label>Teléfono principal</mat-label>
+                                <input matInput type="tel" formControlName="cLegTelefonoPrincipal" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Teléfono móvil</mat-label>
+                                <input matInput type="tel" formControlName="cLegTelefonoMovil" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Correo electrónico laboral</mat-label>
+                                <input matInput type="email" formControlName="cLegCorreoElectronicoLaboral">
+                                <mat-error *ngIf="informacionPersonalForm.get('cLegCorreoElectronicoLaboral')?.errors?.['email']">
+                                    Ingrese un correo electrónico válido
+                                </mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Correo electrónico personal</mat-label>
+                                <input matInput type="email" formControlName="cLegCorreoElectronicoPersonal">
+                                <mat-error *ngIf="informacionPersonalForm.get('cLegCorreoElectronicoPersonal')?.errors?.['email']">
+                                    Ingrese un correo electrónico válido
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Datos de contacto en caso de emergencia -->
+                    <div class="border rounded-lg p-3 sm:p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Datos de contacto en caso de emergencia</h2>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <mat-form-field class="w-full">
+                                <mat-label>Nombre</mat-label>
+                                <input matInput formControlName="cLegContactoEmergenciaNombre" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Teléfono fijo</mat-label>
+                                <input matInput type="tel" formControlName="cLegContactoEmergenciaTelefonoFijo" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Teléfono móvil</mat-label>
+                                <input matInput type="tel" formControlName="cLegContactoEmergenciaTelefonoMovil" uppercase>
+                            </mat-form-field>
+                        </div>
+                    </div>
+
+                    <!-- Licenciado de la FF.AA -->
+                    <div class="border rounded-lg p-3 sm:p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Licenciado de la FF.AA</h2>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                            <mat-slide-toggle formControlName="bLegLicenciadoFaa">
+                                ¿Es licenciado?
+                            </mat-slide-toggle>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Constancia FF.AA</mat-label>
+                                <input matInput formControlName="cLegConstanciaFaa" uppercase>
+                            </mat-form-field>
+
+                            <div>
+                                <app-archivo-handler
+                                    [archivoId]="informacionPersonalForm.get('iArchIdFaa')?.value"
+                                    (iArchId)="onArchivoFaaSelected($event)"
+                                    containerClass="w-full">
+                                </app-archivo-handler>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datos de discapacidad -->
+                    <div class="border rounded-lg p-3 sm:p-4 mt-4">
+                        <h2 class="text-lg font-medium mb-4">Datos de discapacidad</h2>
+
+                        <mat-slide-toggle class="mb-4" formControlName="bLegTieneDiscapacidad">¿Tiene discapacidad?</mat-slide-toggle>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <mat-form-field class="w-full">
+                                <mat-label>Entidad emisora de resolución o constancia</mat-label>
+                                <input matInput formControlName="cLegEntidadEmisoraDiscapacidad" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Número de resolución o constancia</mat-label>
+                                <input matInput formControlName="cLegNumeroDocumentoDiscapacidad" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Fecha de emisión de resolución o constancia</mat-label>
+                                <input matInput [matDatepicker]="emisionPicker" 
+                                       formControlName="dLegFechaEmisionDocumentoDiscapacidad">
+                                <mat-datepicker-toggle matSuffix [for]="emisionPicker"></mat-datepicker-toggle>
+                                <mat-datepicker #emisionPicker></mat-datepicker>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Discapacidad</mat-label>
+                                <input matInput formControlName="cLegNombreDiscapacidad" uppercase>
+                            </mat-form-field>
+
+                            <mat-form-field class="w-full">
+                                <mat-label>Grado</mat-label>
+                                <input matInput formControlName="cLegGradoDiscapacidad" uppercase>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="mt-4">
+                            <p class="mb-2">Documento sustentatorio</p>
+                            <app-archivo-handler
+                                [maxFileSize]="2"
+                                [allowedExtensions]="['.pdf']"
+                                [required]="false"
+                                [archivoId]="informacionPersonalForm.get('iArchIdDiscapacidad')?.value"
+                                (archivoSeleccionado)="onArchivoDiscapacidadDocumentoSelected($event)"
+                                (iArchId)="onArchivoDiscapacidadSelected($event)"
+                                containerClass="w-full">
+                            </app-archivo-handler>
+                        </div>
+
+                        <mat-form-field class="w-full mt-4">
+                            <mat-label>Anotaciones</mat-label>
+                            <textarea matInput rows="3" formControlName="cLegAnotaciones" uppercase></textarea>
+                        </mat-form-field>
+
+                        <!-- Botones de acción -->
+                        <div class="flex flex-col sm:flex-row justify-between gap-2 mt-6">
+                            <button mat-stroked-button routerLink="/principal/inicio" class="w-full sm:w-auto">
+                                <mat-icon>arrow_back</mat-icon>
+                                RETORNAR
+                            </button>
+                            <button mat-raised-button color="primary" (click)="guardarDatosPersonales()" class="w-full sm:w-auto">
+                                GUARDAR
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </mat-tab>
+        <mat-tab label="Datos domiciliarios">
+            <app-datos-domiciliarios [legajo]="legajo"></app-datos-domiciliarios>
+        </mat-tab>
+        <mat-tab label="Datos de familiares">
+            <app-datos-familiares [legajo]="legajo"></app-datos-familiares>
+        </mat-tab>
+        <mat-tab label="Declaración jurada, certificados y otros">
+            <app-declaracion-jurada></app-declaracion-jurada>
+        </mat-tab>
+    </mat-tab-group>
+</div>

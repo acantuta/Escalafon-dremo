@@ -1,0 +1,361 @@
+<!-- Tabla de acciones de vínculo -->
+<div class="overflow-x-auto">
+    <table mat-table [dataSource]="vinculaciones" class="w-full">
+        <!-- Columna N° -->
+        <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef> N° </th>
+            <td mat-cell *matCellDef="let i = index"> {{i + 1}} </td>
+        </ng-container>
+
+        <!-- Columna Acción -->
+        <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef> ACCIÓN </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cAccVincNombre}} </td>
+        </ng-container>
+
+        <!-- Columna Motivo -->
+        <ng-container matColumnDef="motivo">
+            <th mat-header-cell *matHeaderCellDef> MOTIVO </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cMotAccVincNombre}} </td>
+        </ng-container>
+
+        <!-- Columna Régimen -->
+        <ng-container matColumnDef="regimen">
+            <th mat-header-cell *matHeaderCellDef> RÉGIMEN </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cRegLabNombre}} </td>
+        </ng-container>
+
+        <!-- Columna F. Inicio -->
+        <ng-container matColumnDef="fInicio">
+            <th mat-header-cell *matHeaderCellDef> F. INICIO </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.dtVincLabFechaInicio | date:'dd/MM/yyyy'}} </td>
+        </ng-container>
+
+        <!-- Columna F. Fin -->
+        <ng-container matColumnDef="fFin">
+            <th mat-header-cell *matHeaderCellDef> F. FIN </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.dtVincLabFechaFin | date:'dd/MM/yyyy'}} </td>
+        </ng-container>
+
+        <!-- Columna Centro Laboral -->
+        <ng-container matColumnDef="centroLaboral">
+            <th mat-header-cell *matHeaderCellDef> CENTRO LABORAL </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cCentLabNombre}} </td>
+        </ng-container>
+
+        <!-- Columna Cargo -->
+        <ng-container matColumnDef="cargo">
+            <th mat-header-cell *matHeaderCellDef> CARGO </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cCargLabNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="resolucion">
+            <th mat-header-cell *matHeaderCellDef> RESOLUCIÓN </th>
+            <td mat-cell *matCellDef="let vinculacion"> {{vinculacion.cVincLabNumeroDocumento}} </td>
+        </ng-container>
+
+        <!-- Columna Acciones -->
+        <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+            <td mat-cell *matCellDef="let vinculacion">
+                <button mat-icon-button (click)="editarVinculacion(vinculacion)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="eliminarVinculacion(vinculacion.iVincLabId)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button (click)="visualizarVinculacion(vinculacion)" matTooltip="Visualizar">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+</div>
+
+<form [formGroup]="vinculacionForm" class="mt-4">
+    <!-- Datos principales del vínculo laboral -->
+    <div class="border rounded p-2 sm:p-4 mb-2 sm:mb-4">
+        <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos principales del vínculo laboral</h2>
+        
+        <!-- Primera fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <!-- Tipo de documento -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Tipo de documento</mat-label>
+                <mat-select formControlName="iTipoDocId">
+                    <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+                        {{tipo.cTipoDocNombre}}
+                    </mat-option>
+                </mat-select>
+                <mat-error *ngIf="vinculacionForm.get('iTipoDocId')?.errors?.['required'] && 
+                                  vinculacionForm.get('iTipoDocId')?.touched">
+                    El tipo de documento es requerido
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Número de documento -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Número de documento</mat-label>
+                <input matInput 
+                       formControlName="cVincLabNumeroDocumento" 
+                       placeholder="Ingrese número de documento"
+                       uppercase>
+                <mat-error *ngIf="vinculacionForm.get('cVincLabNumeroDocumento')?.errors?.['required'] && 
+                                  vinculacionForm.get('cVincLabNumeroDocumento')?.touched">
+                    El número de documento es requerido
+                </mat-error>
+            </mat-form-field>
+
+            <!-- Fecha de documento -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Fecha de documento</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dtVincLabFechaDocumento">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <!-- Segunda fila -->
+    <div class="mb-2 sm:mb-4">
+        <app-archivo-handler
+            [archivoId]="vinculacionForm.get('iArchId')?.value"
+            (archivoSeleccionado)="onArchivoSeleccionado($event)"
+            [required]="false"
+            [allowedExtensions]="['.pdf']"
+            [maxFileSize]="2"
+            containerClass="w-full">
+        </app-archivo-handler>
+    </div>
+
+        <!-- Tercera fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <!-- Régimen laboral -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Régimen laboral</mat-label>
+                <mat-select formControlName="iRegLabId" (selectionChange)="onRegimenChange($event.value)" required>
+                    <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+                        {{regimen.cRegLabNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Acción -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Acción</mat-label>
+                <mat-select formControlName="iAccVincId" (selectionChange)="onAccionChange($event.value)" required>
+                    <mat-option *ngFor="let accion of accionesVinculacion" [value]="accion.iAccVincId">
+                        {{accion.cAccVincNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Motivo acción -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Motivo acción</mat-label>
+                <mat-select formControlName="iMotAccVincId">
+                    <mat-option *ngFor="let motivo of motivosAccion" [value]="motivo.iMotAccVincId">
+                        {{motivo.cMotAccVincNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <!-- Datos del centro laboral -->
+    <div class="border rounded p-2 sm:p-4 mb-2 sm:mb-4">
+        <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos del centro laboral</h2>
+        
+        <!-- Información del centro educativo -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <mat-form-field>
+                <mat-label>Código modular IE</mat-label>
+                <input matInput formControlName="codigoModularIE" readonly>
+                <button mat-icon-button matSuffix (click)="buscarCentroLaboral()">
+                    <mat-icon>search</mat-icon>
+                </button>
+            </mat-form-field>
+        </div>
+
+        <!-- Tabla de información -->
+        <div class="overflow-x-auto mb-2 sm:mb-4">
+            <table class="w-full" *ngIf="centroLaboralSeleccionado">
+                <tr class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <td class="font-bold">Centro laboral</td>
+                    <td>{{centroLaboralSeleccionado.cCentLabNombre}}</td>
+                </tr>
+                <tr class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <td class="font-bold">Modalidad educativa</td>
+                    <td>{{centroLaboralSeleccionado.cModEduNombre}}</td>
+                </tr>
+                <tr class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <td class="font-bold">Región</td>
+                    <td>{{centroLaboralSeleccionado.cDirRegNombre}}</td>
+                </tr>
+                <tr class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <td class="font-bold">Instancia de gestión</td>
+                    <td>{{centroLaboralSeleccionado.cInstGeEduNombre}}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Datos adicionales del puesto -->
+    <div class="border rounded p-2 sm:p-4 mb-2 sm:mb-4">
+        <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos adicionales del puesto</h2>
+
+        <!-- Primera fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <!-- Código de plaza -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Código de plaza</mat-label>
+                <input matInput 
+                       formControlName="cVincLabCodigoPlaza" 
+                       placeholder="Ingrese código de plaza"
+                       uppercase>
+            </mat-form-field>
+
+            <!-- Escala categoría nivel grupo - Solo visible si el régimen lo permite -->
+            <mat-form-field appearance="fill" class="w-full" 
+                *ngIf="configService.tieneEscalaCategoriaGrupo(vinculacionForm.get('iRegLabId')?.value)">
+                <mat-label>Escala categoría nivel grupo</mat-label>
+                <mat-select formControlName="iEscCatId">
+                    <mat-option *ngFor="let escala of escalaCategorias" [value]="escala.iEscCatId">
+                        {{escala.cEscCatNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- USE/zona/subregión -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>USE/zona/subregión</mat-label>
+                <input matInput 
+                       formControlName="cVincLabUseZonaSubRegion" 
+                       placeholder="Ingrese USE/zona/subregión"
+                       uppercase>
+            </mat-form-field>
+        </div>
+
+        <!-- Segunda fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-2 sm:mb-4" 
+             *ngIf="configService.tieneGrupoOcupacional(vinculacionForm.get('iRegLabId')?.value)">
+            <!-- Grupo ocupacional -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Grupo ocupacional</mat-label>
+                <mat-select formControlName="iGrupOcupId" (selectionChange)="onGrupoOcupacionalChange($event.value)">
+                    <mat-option *ngFor="let grupo of gruposOcupacionales" [value]="grupo.iGrupOcupId">
+                        {{grupo.cGrupOcupNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Categoría remunerativa -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Categoría remunerativa</mat-label>
+                <mat-select formControlName="iCatRemuId">
+                    <mat-option *ngFor="let categoria of categoriasRemunerativas" [value]="categoria.iCatRemuId">
+                        {{categoria.cCatRemuNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <!-- Tercera fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <!-- Cargo -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Cargo</mat-label>
+                <mat-select formControlName="iCargLabId">
+                    <mat-option *ngFor="let cargo of cargos" [value]="cargo.iCargLabId">
+                        {{cargo.cCargLabNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Jornada laboral -->
+            <mat-form-field appearance="fill" class="w-full">
+                <mat-label>Jornada laboral</mat-label>
+                <mat-select formControlName="iJorLabId">
+                    <mat-option *ngFor="let jornada of jornadasLaborales" [value]="jornada.iJorLabId">
+                        {{jornada.cJorLabNombre}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Mandato judicial -->
+            <div class="flex items-center">
+                <mat-checkbox formControlName="bVincLabMandatoJudicial">
+                    ¿Por mandato judicial?
+                </mat-checkbox>
+            </div>
+        </div>
+
+        <!-- Cuarta fila -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-2 sm:mb-4">
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha de inicio</mat-label>
+                <input matInput [matDatepicker]="pickerInicio" formControlName="dtVincLabFechaInicio" required>
+                <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                <mat-datepicker #pickerInicio></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill">
+                <mat-label>Fecha fin</mat-label>
+                <input matInput [matDatepicker]="pickerFin" formControlName="dtVincLabFechaFin">
+                <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFin></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <!-- Anotaciones -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Anotaciones</mat-label>
+            <textarea matInput 
+                      rows="3" 
+                      formControlName="cVincLabAnotaciones"
+                      placeholder="Ingrese anotaciones adicionales"
+                      uppercase>
+            </textarea>
+        </mat-form-field>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-2 mt-2 sm:mt-4">
+            <button mat-button 
+                    color="primary" 
+                    type="button" 
+                    routerLink="/principal/inicio"
+                    class="w-full sm:w-auto">
+                <mat-icon>arrow_back</mat-icon> RETORNAR
+            </button>
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <!-- Botones para modo crear/editar -->
+                <ng-container *ngIf="modoFormulario !== 'ver'">
+                    <button mat-stroked-button 
+                            type="button" 
+                            (click)="limpiarFormulario()"
+                            class="w-full sm:w-auto">
+                        LIMPIAR
+                    </button>
+                    <button mat-raised-button 
+                            color="primary" 
+                            type="button" 
+                            (click)="guardarVinculacion()"
+                            class="w-full sm:w-auto">
+                        GUARDAR
+                    </button>
+                </ng-container>
+                
+                <!-- Botón para modo visualización -->
+                <button mat-stroked-button 
+                        type="button" 
+                        (click)="limpiarFormulario()"
+                        *ngIf="modoFormulario === 'ver'"
+                        class="w-full sm:w-auto">
+                    CERRAR
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

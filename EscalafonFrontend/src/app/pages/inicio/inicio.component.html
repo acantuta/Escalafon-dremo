@@ -1,0 +1,240 @@
+<!-- Sección de búsqueda -->
+<form [formGroup]="searchForm" (submit)="$event.preventDefault()" class="p-2 md:p-4">
+<mat-card class="mb-4">
+  <mat-card-content class="p-2 md:p-4">
+    
+    <div class="text-lg font-medium mb-4">Criterios de búsqueda</div>
+    
+    <!-- Servidor -->
+    <div class="text-lg font-medium mt-4 mb-2">Servidor</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <mat-form-field class="w-full">
+        <mat-label>Tipo de documento</mat-label>
+        <mat-select formControlName="tipoDocumento" (keyup.enter)="buscar()">
+          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocIdenId">
+            {{ tipo.cTipoDocIdenNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Número de documento</mat-label>
+        <input matInput 
+               formControlName="numeroDocumento" 
+               (keydown.enter)="handleEnterKey($event)"
+               uppercase>
+      </mat-form-field>
+    </div>
+
+    <!-- Campos de apellidos y nombres -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <mat-form-field class="w-full">
+        <mat-label>Primer apellido</mat-label>
+        <input matInput 
+               formControlName="primerApellido" 
+               (keydown.enter)="handleEnterKey($event)"
+               uppercase>
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Segundo apellido</mat-label>
+        <input matInput 
+               formControlName="segundoApellido" 
+               (keydown.enter)="handleEnterKey($event)"
+               uppercase>
+      </mat-form-field>
+
+      <mat-form-field class="w-full">
+        <mat-label>Nombres</mat-label>
+        <input matInput 
+               formControlName="nombres" 
+               (keydown.enter)="handleEnterKey($event)"
+               uppercase>
+      </mat-form-field>
+    </div>
+
+    <!-- Búsqueda avanzada -->
+    <mat-expansion-panel>
+      <mat-expansion-panel-header>
+        <mat-panel-title>Búsqueda avanzada</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <!-- Estado del servidor -->
+      <div class="text-lg font-medium mt-4 mb-2">Estado del servidor</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <mat-form-field class="w-full">
+          <mat-label>Condición laboral</mat-label>
+          <mat-select formControlName="condicionLaboral" (keyup.enter)="buscar()">
+            <mat-option *ngFor="let condicion of condicionesLaborales" [value]="condicion.iCondLabId">
+              {{ condicion.cCondLabNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Situación laboral</mat-label>
+          <mat-select formControlName="situacionLaboral" (keyup.enter)="buscar()">
+            <mat-option *ngFor="let situacion of situacionesLaborales" [value]="situacion.iSitLabId">
+              {{ situacion.cSitLabNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Régimen laboral</mat-label>
+          <mat-select formControlName="regimenLaboral" (keyup.enter)="buscar()">
+            <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+              {{ regimen.cRegLabNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Código plaza</mat-label>
+          <input matInput 
+                 formControlName="codigoPlaza" 
+                 (keyup.enter)="$event.preventDefault(); buscar()"
+                 uppercase>
+        </mat-form-field>
+      </div>
+
+      <!-- Centro -->
+      <div class="text-lg font-medium mt-4 mb-2">Centro</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <mat-form-field class="w-full">
+          <mat-label>Direcciones regionales</mat-label>
+          <mat-select formControlName="direccionRegional" (keyup.enter)="buscar()">
+            <mat-option *ngFor="let direccion of direccionesRegionales" [value]="direccion.iDirRegId">
+              {{ direccion.cDirRegNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Instancias de gestión educativa descentralizadas</mat-label>
+          <mat-select formControlName="instanciaGestionEducativa" (keyup.enter)="buscar()">
+            <mat-option *ngFor="let iged of instanciasGestionEducativa" [value]="iged.iInstGeEduId">
+              {{ iged.cInstGeEduNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Código modular IE</mat-label>
+          <input matInput 
+                 formControlName="codigoModular" 
+                 (keyup.enter)="$event.preventDefault(); buscar()"
+                 uppercase>
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Centro laboral</mat-label>
+          <input matInput 
+                 formControlName="centroLaboral" 
+                 (keyup.enter)="$event.preventDefault(); buscar()"
+                 uppercase>
+        </mat-form-field>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Botones -->
+    <div class="flex flex-col sm:flex-row justify-center gap-2 mt-4">
+      <button mat-stroked-button (click)="limpiar()" class="w-full sm:w-auto">
+        <mat-icon>clear_all</mat-icon>
+        LIMPIAR
+      </button>
+      <button mat-raised-button color="primary" (click)="buscar()" class="w-full sm:w-auto">
+        <mat-icon>search</mat-icon>
+        BUSCAR
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- Tabla de resultados -->
+<mat-card>
+  <mat-card-content>
+    <div class="flex justify-end mb-4">
+      <button mat-raised-button color="primary" routerLink="/principal/legajo/apertura" 
+              class="w-full sm:w-auto">
+        APERTURA DE LEGAJO
+      </button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table mat-table [dataSource]="resultados" class="w-full min-w-[800px]">
+        <!-- N° Column -->
+        <ng-container matColumnDef="nro">
+          <th mat-header-cell *matHeaderCellDef>N°</th>
+          <td mat-cell *matCellDef="let row; let i = index">{{i + 1}}</td>
+        </ng-container>
+
+        <!-- Documento Column -->
+        <ng-container matColumnDef="documento">
+          <th mat-header-cell *matHeaderCellDef>DOCUMENTO</th>
+          <td mat-cell *matCellDef="let row">{{row.cLegNumeroDocumentoIdentida}}</td>
+        </ng-container>
+
+        <!-- Apellidos y Nombres Column -->
+        <ng-container matColumnDef="apellidosNombres">
+          <th mat-header-cell *matHeaderCellDef>APELLIDOS Y NOMBRES</th>
+          <td mat-cell *matCellDef="let row">{{row.cLegPrimerApellido}} {{row.cLegSegundoApellido}}, {{row.cLegNombres}}</td>
+        </ng-container>
+
+        <!-- Centro Laboral Column -->
+        <ng-container matColumnDef="centroLaboral">
+          <th mat-header-cell *matHeaderCellDef>CENTRO LABORAL</th>
+          <td mat-cell *matCellDef="let row">{{row.cCentLabNombre}}</td>
+        </ng-container>
+
+        <!-- Condición Laboral Column -->
+        <ng-container matColumnDef="condicionLaboral">
+          <th mat-header-cell *matHeaderCellDef>CONDICIÓN LABORAL</th>
+          <td mat-cell *matCellDef="let row">{{row.cCondLabNombre}}</td>
+        </ng-container>
+
+        <!-- Situación Laboral Column -->
+        <ng-container matColumnDef="situacionLaboral">
+          <th mat-header-cell *matHeaderCellDef>SITUACIÓN LABORAL</th>
+          <td mat-cell *matCellDef="let row">{{row.cSitLabNombre}}</td>
+        </ng-container>
+
+        <!-- Régimen Laboral Column -->
+        <ng-container matColumnDef="regimenLaboral">
+          <th mat-header-cell *matHeaderCellDef>RÉGIMEN LABORAL</th>
+          <td mat-cell *matCellDef="let row">{{row.cRegLabNombre}}</td>
+        </ng-container>
+
+        <!-- Acción Column -->
+        <ng-container matColumnDef="accion">
+          <th mat-header-cell *matHeaderCellDef>ACCIÓN</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'informacion-personal']">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'ubicacion']">
+              <mat-icon>folder_especial</mat-icon>
+            </button>
+            <button mat-icon-button [routerLink]="['/principal/legajo', 'edicion', row.iLegId]">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion'];"></tr>
+      </table>
+    </div>
+
+    <mat-paginator
+      class="mt-4"
+      [length]="totalRegistros"
+      [pageSize]="tamanioPagina"
+      [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="paginaActual"
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </mat-card-content>
+</mat-card>
+</form>

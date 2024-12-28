@@ -1,0 +1,132 @@
+<div class="p-4">
+  <!-- Título principal -->
+  <div class="bg-primary text-white p-3 mb-4">
+    <h1 class="text-xl">Centros de trabajo</h1>
+  </div>
+
+  <!-- Reemplazar la sección de Tabs -->
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)" class="mb-4">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="font-medium">Búsqueda de centros de trabajo vigente</span>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <span class="font-medium">Búsqueda de centros de trabajo no vigente</span>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Filtros -->
+  <div class="border rounded-lg p-4 mb-4">
+    <h2 class="mb-4">
+      Filtros de búsqueda - {{ selectedTabIndex === 0 ? 'Centros vigentes' : 'Centros no vigentes' }}
+    </h2>
+    
+    <form [formGroup]="searchForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <mat-form-field>
+        <mat-label>DRE</mat-label>
+        <mat-select formControlName="dre">
+          <mat-option [value]="dre.iDirRegId" *ngFor="let dre of direccionesRegionales">
+            {{ dre.cDirRegNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>UGEL</mat-label>
+        <mat-select formControlName="ugel">
+          <mat-option [value]="">Seleccione UGEL</mat-option>
+          <mat-option [value]="ugel.iInstGeEduId" *ngFor="let ugel of ugeles">
+            {{ ugel.cInstGeEduNombre }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="!searchForm.get('dre')?.value">Seleccione primero una DRE</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Modalidad educativa</mat-label>
+        <mat-select formControlName="modalidadEducativa">
+          <mat-option [value]="">Seleccione modalidad</mat-option>
+          <mat-option [value]="modalidad.iModEduId" *ngFor="let modalidad of modalidades">
+            {{ modalidad.cModEduNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Nivel educativo</mat-label>
+        <mat-select formControlName="nivelEducativa">
+          <mat-option [value]="">Seleccione nivel</mat-option>
+          <mat-option [value]="nivel.iNivEduId" *ngFor="let nivel of nivelesEducativos">
+            {{ nivel.iNivEduNombre }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="!searchForm.get('modalidadEducativa')?.value">
+          Seleccione primero una modalidad
+        </mat-hint>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="codigoModularIE" placeholder="Código modular IE">
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="institucionEducativa" placeholder="Institución educativa">
+      </mat-form-field>
+    </form>
+
+    <div class="flex justify-end gap-4 mt-4">
+      <button mat-stroked-button (click)="onClear()">LIMPIAR</button>
+      <button mat-raised-button color="primary" (click)="onSearch()">BUSCAR</button>
+    </div>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div class="border rounded-lg p-4">
+    <h2 class="mb-4">Resultados de la búsqueda</h2>
+    
+    <table mat-table [dataSource]="resultados" class="w-full">
+      <ng-container matColumnDef="codigoModular">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50">CÓDIGO MODULAR</th>
+        <td mat-cell *matCellDef="let element">{{element.cCentLabCodigoModular}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="centroLaboral">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50">CENTRO LABORAL</th>
+        <td mat-cell *matCellDef="let element">{{element.cCentLabNombre}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="iged">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50">IGED</th>
+        <td mat-cell *matCellDef="let element">{{element.cInstGeEduNombre}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="nivelEducativo">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50">NIVEL EDUCATIVO</th>
+        <td mat-cell *matCellDef="let element">{{element.iNivEduNombre}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="modalidadEducativa">
+        <th mat-header-cell *matHeaderCellDef class="bg-gray-50">MODALIDAD EDUCATIVA</th>
+        <td mat-cell *matCellDef="let element">{{element.cModEduNombre}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          (click)="onRowClick(row)"
+          class="cursor-pointer hover:bg-gray-100">
+      </tr>
+    </table>
+
+    <mat-paginator 
+      [length]="totalRegistros"
+      [pageSize]="tamanioPagina"
+      [pageSizeOptions]="[1000]"
+      [pageIndex]="paginaActual"
+      [showFirstLastButtons]="true"
+      aria-label="Seleccionar página de resultados">
+    </mat-paginator>
+  </div>
+</div>

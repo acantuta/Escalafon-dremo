@@ -1,0 +1,91 @@
+<!-- Sección de generación de reporte -->
+<mat-card class="mb-4">
+    <mat-card-header>
+        <mat-card-title>Generación de reporte de hoja de vida</mat-card-title>
+    </mat-card-header>
+
+    <form [formGroup]="hojaVidaForm">
+        <mat-card-content class="p-4">
+            <!-- Datos del reporte -->
+            <div class="p-4 rounded-lg mb-4 bg-gray-50">
+                <h3 class="text-lg font-medium mb-4">Datos del reporte de hoja de vida</h3>
+
+                <!-- Campo de anotaciones a ancho completo -->
+                <mat-form-field class="w-full mb-4">
+                    <mat-label>Anotaciones</mat-label>
+                    <textarea matInput rows="3" formControlName="cHojVidAnotaciones"></textarea>
+                </mat-form-field>
+
+                <!-- Fecha de generación con diseño responsivo -->
+                <div class="flex justify-end">
+                <mat-form-field class="w-full sm:w-48">
+                    <mat-label>Fecha generación</mat-label>
+                    <input matInput [matDatepicker]="fechaGeneracion" formControlName="dHojVidFechaGeneracion">
+                    <mat-datepicker-toggle matSuffix [for]="fechaGeneracion"></mat-datepicker-toggle>
+                    <mat-datepicker #fechaGeneracion></mat-datepicker>
+                </mat-form-field>
+                </div>
+            </div>
+
+            <!-- Expediente -->
+            <div class="p-4 rounded-lg bg-gray-50">
+                <h3 class="text-lg font-medium mb-4">Expediente de solicitud de reporte de hoja de vida</h3>
+
+                <!-- Grid responsivo para campos del expediente -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <mat-form-field>
+                        <mat-label>Número de expediente</mat-label>
+                        <input matInput formControlName="cHojVidNumeroExpediente">
+                        <mat-error *ngIf="hojaVidaForm.get('cHojVidNumeroExpediente')?.hasError('required')">
+                            El número de expediente es requerido
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Nombre de solicitante</mat-label>
+                        <input matInput formControlName="cHojVidNombreSolicitante">
+                        <mat-error *ngIf="hojaVidaForm.get('cHojVidNombreSolicitante')?.hasError('required')">
+                            El nombre del solicitante es requerido
+                        </mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Fecha de expediente</mat-label>
+                        <input matInput [matDatepicker]="fechaExpediente" formControlName="dHojVidFechaExpediente">
+                        <mat-datepicker-toggle matSuffix [for]="fechaExpediente"></mat-datepicker-toggle>
+                        <mat-datepicker #fechaExpediente></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+
+        <!-- Botones de acción con diseño responsivo -->
+        <mat-card-actions class="flex flex-col sm:flex-row justify-end p-4 gap-2">
+            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <button type="button" 
+                        mat-stroked-button 
+                        class="flex items-center justify-center gap-2"
+                        (click)="limpiarFormulario()">
+                    <mat-icon>clear</mat-icon>
+                    Limpiar
+                </button>
+                <button type="button" 
+                        mat-stroked-button 
+                        class="flex items-center justify-center gap-2"
+                        (click)="vistaPrevia()">
+                    <mat-icon>preview</mat-icon>
+                    Vista previa
+                </button>
+                <button type="button" 
+                        mat-raised-button 
+                        color="primary" 
+                        class="flex items-center justify-center gap-2"
+                        [disabled]="!hojaVidaForm.valid"
+                        (click)="generarHojaVida()">
+                    <mat-icon>assignment</mat-icon>
+                    GENERAR
+                </button>
+            </div>
+        </mat-card-actions>
+    </form>
+</mat-card> 

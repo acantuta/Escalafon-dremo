@@ -1,0 +1,85 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: General / Centros Laborales',
+  vista: {
+    nombre: 'esc.V_MantenimientoCentrosLaborales',
+    columnas: [
+      {
+        campo: 'iCentLabId',
+        label: 'ID',
+        orden: 1
+      },
+      {
+        campo: 'cDirRegNombre',
+        label: 'Dirección Regional',
+        orden: 2
+      },
+      {
+        campo: 'cInstGeEduNombre',
+        label: 'UGEL',
+        orden: 3
+      },
+      {
+        campo: 'cModEduNombre',
+        label: 'Modalidad Educativa',
+        orden: 4
+      },
+      {
+        campo: 'iNivEduNombre',
+        label: 'Nivel Educativo',
+        orden: 5
+      },
+      {
+        campo: 'cCentLabNombre',
+        label: 'Nombre',
+        orden: 6
+      },
+      {
+        campo: 'bCentLabEsVigente',
+        label: 'Es Vigente',
+        orden: 7
+      }
+    ]
+  },
+  tabla: 'esc.centros_laborales',
+  dependencias: [
+    {
+      campo: 'iDirRegId',
+      tabla: 'esc.direcciones_regionales',
+      campoClave: 'iDirRegId',
+      campoMostrar: 'cDirRegNombre'
+    },
+    {
+      campo: 'iInstGeEduId',
+      tabla: 'esc.instancias_gestion_educativa_descentralizadas',
+      campoClave: 'iInstGeEduId',
+      campoMostrar: 'cInstGeEduNombre',
+      dependeDe: {
+        campo: 'iDirRegId',
+        tabla: 'esc.direcciones_regionales'
+      }
+    },
+    {
+      campo: 'iModEduId',
+      tabla: 'esc.modalidades_educativas',
+      campoClave: 'iModEduId',
+      campoMostrar: 'cModEduNombre'
+    },
+    {
+      campo: 'iNivEduId',
+      tabla: 'esc.niveles_educativos',
+      campoClave: 'iNivEduId',
+      campoMostrar: 'iNivEduNombre',
+      dependeDe: {
+        campo: 'iModEduId',
+        tabla: 'esc.modalidades_educativas'
+      }
+    }
+  ],
+  labels: {
+    'iDirRegId': 'Dirección Regional',
+    'iInstGeEduId': 'UGEL',
+    'iModEduId': 'Modalidad Educativa',
+    'iNivEduId': 'Nivel Educativo',
+    'cCentLabCodigoModular': 'Código Modular'
+  }
+}"></mantenimiento-dinamico-component> 

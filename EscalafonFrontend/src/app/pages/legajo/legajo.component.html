@@ -1,0 +1,58 @@
+<div class="flex h-full">
+  <mat-sidenav-container class="flex-1">
+    <mat-sidenav #sidenav
+      [mode]="isMobile ? 'over' : 'side'"
+      [opened]="!isMobile"
+      [fixedInViewport]="isMobile"
+      class="w-full sm:w-72 lg:w-80 border-r">
+      <div class="h-full bg-white">
+        <!-- Encabezado con ícono de legajo -->
+        <div class="text-gray-500 p-4">
+          <div class="flex items-center gap-3">
+            <mat-icon>folder_shared</mat-icon>
+            <span class="text-lg">Legajo</span>
+          </div>
+        </div>
+
+        <!-- Lista de navegación -->
+        <mat-nav-list class="!p-0">
+          <a mat-list-item *ngFor="let item of menuItems" 
+             [routerLink]="['/principal/legajo', legajo?.iLegId, item.route]"
+             routerLinkActive="bg-gray-100"
+             class="!h-auto border-b">
+            <div class="flex items-start py-3 w-full">
+              <!-- Icono -->
+              <div class="shrink-0 w-12 flex justify-center">
+                <mat-icon class="text-gray-600">{{item.icon}}</mat-icon>
+              </div>
+              <!-- Texto -->
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-gray-900 font-medium text-sm whitespace-nowrap">{{ item.text.split(':')[0] }}</span>
+                  <span class="text-gray-600 text-sm leading-snug whitespace-normal break-words">{{ item.text.split(':')[1] }}</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </mat-nav-list>
+      </div>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="bg-gray-50">
+      <!-- Barra superior con botón de menú -->
+      <div class="sticky top-0 z-10 bg-white border-b shadow-sm" [class.hidden]="!isMobile">
+        <div class="flex items-center h-14 px-4">
+          <button mat-icon-button (click)="toggleSidenav()">
+            <mat-icon>menu</mat-icon>
+          </button>
+          <span class="ml-4 text-lg">Legajo</span>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="p-4">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

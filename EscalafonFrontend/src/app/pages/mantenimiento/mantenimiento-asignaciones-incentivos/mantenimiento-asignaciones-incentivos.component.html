@@ -1,0 +1,42 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: 6) Compensaciones / Asignaciones e Incentivos',
+  vista: {
+    nombre: 'esc.V_MantenimientoAsignacionesIncentivos',
+    columnas: [
+      {
+        campo: 'iAsigIncId',
+        label: 'ID',
+        orden: 1
+      },
+      {
+        campo: 'cRegLabNombre',
+        label: 'Régimen Laboral',
+        orden: 2
+      },
+      {
+        campo: 'cAsigIncNombre',
+        label: 'Nombre',
+        orden: 3
+      },
+      {
+        campo: 'cAsigIncDescripcion',
+        label: 'Descripción',
+        orden: 4
+      }
+    ]
+  },
+  tabla: 'esc.asignaciones_incentivos',
+  labels: {
+    'cAsigIncNombre': 'Nombre de la Asignación/Incentivo',
+    'cAsigIncDescripcion': 'Descripción',
+    'iRegLabId': 'Régimen Laboral'
+  },
+  dependencias: [
+    {
+      campo: 'iRegLabId',
+      tabla: 'esc.regimenes_laborales',
+      campoClave: 'iRegLabId',
+      campoMostrar: 'cRegLabNombre'
+    }
+  ]
+}"></mantenimiento-dinamico-component> 

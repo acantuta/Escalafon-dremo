@@ -1,0 +1,48 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: Condiciones Situaciones Laborales',
+  vista: {
+    nombre: 'esc.V_CondicionesLaboralesSituacionesLaborales',
+    columnas: [
+      {
+        campo: 'iCondSitId',
+        label: 'Id',
+        orden: 1
+      },
+      {
+        campo: 'cCondLabNombre',
+        label: 'Nombre Condición',
+        orden: 2
+      },
+      {
+        campo: 'cSitLabNombre',
+        label: 'Nombre Situación',
+        orden: 4
+      },
+      {
+        campo: 'dFechaRegistro',
+        label: 'Fecha Registro',
+        orden: 5,
+        visible: false
+      }
+    ]
+  },
+  tabla: 'esc.condiciones_situaciones_laborales',
+  dependencias: [
+    {
+      campo: 'iCondLabId',
+      tabla: 'esc.condiciones_laborales',
+      campoClave: 'iCondLabId',
+      campoMostrar: 'cCondLabNombre'
+    },
+    {
+      campo: 'iSitLabId',
+      tabla: 'esc.situaciones_laborales',
+      campoClave: 'iSitLabId',
+      campoMostrar: 'cSitLabNombre'
+    }
+  ],
+  labels: {
+    'iCondLabId': 'Condición Laboral',
+    'iSitLabId': 'Situación Laboral'
+  }
+}"></mantenimiento-dinamico-component> 

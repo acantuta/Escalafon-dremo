@@ -1,0 +1,73 @@
+<div [class]="containerClass" 
+     [ngClass]="{'border-2 border-red-500 rounded-md': showError}">
+  <div class="archivo-handler">
+    <form [formGroup]="archivoForm" class="w-full">
+      <div class="flex items-center gap-4">
+        <!-- Selector de archivo y nombre -->
+        <div class="flex items-center gap-2">
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon class="mr-1">attach_file</mat-icon>
+            Archivo<span class="text-red-500" *ngIf="required">*</span>
+          </button>
+          <input #fileInput type="file" 
+                 (change)="onFileSelected($event)" 
+                 style="display: none"
+                 [accept]="allowedExtensions.join(',')"
+                 (click)="fileInput.value = ''">
+          <span class="text-sm text-gray-500" *ngIf="selectedFile?.name || archivoActual?.cArchUuid">
+            {{selectedFile?.name || 'Archivo #' + archivoActual?.iArchId}}
+          </span>
+          <!-- Spinner de carga -->
+          <mat-spinner *ngIf="uploading" diameter="20" class="ml-2"></mat-spinner>
+        </div>
+
+        <!-- Folios - Ahora condicionado con *ngIf="showFolios" -->
+        <mat-form-field *ngIf="showFolios" appearance="fill" class="w-24">
+          <mat-label>Folios</mat-label>
+          <input matInput 
+                 type="number" 
+                 formControlName="iFolios" 
+                 min="1"
+                 (blur)="onFoliosBlur()">
+          <mat-error *ngIf="archivoForm.get('iFolios')?.errors?.['min']">
+            Mín. 1
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Botones de acción -->
+        <div class="flex gap-2">
+          <!-- Botón Limpiar -->
+          <button mat-icon-button type="button" 
+                  (click)="limpiar()" 
+                  matTooltip="Limpiar"
+                  [disabled]="uploading">
+            <mat-icon>clear</mat-icon>
+          </button>
+          
+          <!-- Botón Descargar - Solo visible cuando hay archivo -->
+          <button mat-icon-button type="button" 
+                  *ngIf="archivoActual?.cArchUuid"
+                  (click)="descargarArchivo()"
+                  matTooltip="Descargar"
+                  [disabled]="uploading">
+            <mat-icon>download</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mensajes de error y ayuda -->
+      <div class="flex justify-between text-xs mt-1">
+        <span class="text-gray-500">
+          {{allowedExtensions.join(', ')}} - máx. {{maxFileSize}}MB
+        </span>
+      </div>
+
+      <!-- Barra de progreso -->
+      <mat-progress-bar *ngIf="uploading" 
+                       mode="determinate" 
+                       [value]="uploadProgress"
+                       class="mt-2">
+      </mat-progress-bar>
+    </form>
+  </div>
+</div> 

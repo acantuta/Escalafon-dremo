@@ -1,0 +1,15 @@
+<!-- Reemplazamos la información del empleado con el componente servidor-publico -->
+<app-servidor-publico></app-servidor-publico>
+
+<!-- Sistema de pestañas -->
+<mat-tab-group (selectedTabChange)="onTabChange($event)">
+  <!-- Pestaña: Crear hoja de vida -->
+  <mat-tab label="Crear hoja de vida">
+    <app-crear-hoja-vida></app-crear-hoja-vida>
+  </mat-tab>
+
+  <!-- Pestaña: Historial de hoja de vida -->
+  <mat-tab label="Historial">
+    <app-historial-hoja-vida></app-historial-hoja-vida>
+  </mat-tab>
+</mat-tab-group>

@@ -1,0 +1,40 @@
+<div class="bg-gray-50 p-4 rounded-lg">
+  <h2 class="text-lg font-medium mb-4">Datos del Servidor</h2>
+  <div class="grid grid-cols-4 gap-4">
+    <!-- Primera fila -->
+    <div>
+      <p class="text-gray-600 text-sm">Documento de identidad</p>
+      <p class="font-medium">{{ legajo?.cLegNumeroDocumentoIdentida || '-' }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">Apellidos y nombres</p>
+      <p class="font-medium">{{ (legajo?.cLegPrimerApellido || '') + ' ' + (legajo?.cLegSegundoApellido || '') + ' ' + (legajo?.cLegNombres || '') }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">Régimen laboral</p>
+      <p class="font-medium">{{ legajo?.cRegLabNombre || '-' }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">IGED</p>
+      <p class="font-medium">{{ legajo?.cInstGeEduNombre || '-' }}</p>
+    </div>
+
+    <!-- Segunda fila -->
+    <div>
+      <p class="text-gray-600 text-sm">Centro laboral</p>
+      <p class="font-medium">{{ legajo?.cCentLabNombre || '-' }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">Cargo</p>
+      <p class="font-medium">{{ legajo?.cLegCargo || '-' }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">Condición</p>
+      <p class="font-medium">{{ legajo?.cCondLabNombre || '-' }}</p>
+    </div>
+    <div>
+      <p class="text-gray-600 text-sm">Situación laboral</p>
+      <p class="font-medium">{{ legajo?.cSitLabNombre || '-' }}</p>
+    </div>
+  </div>
+</div>

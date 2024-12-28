@@ -1,0 +1,52 @@
+<!-- Contenedor principal del sidebar -->
+<mat-sidenav-container class="h-full min-h-screen">
+  <mat-sidenav opened mode="side" class="w-64 bg-gray-50">
+    <!-- Tarjeta de usuario -->
+    <mat-card class="m-4">
+      <mat-card-content class="flex items-center gap-2">
+        <mat-icon>person</mat-icon>
+        <span>Nombre Apellidos</span>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Lista de navegación -->
+    <mat-nav-list>
+      <!-- Login -->
+      <a mat-list-item routerLink="/login">
+        <mat-icon>login</mat-icon>
+        <span class="ml-2">Login</span>
+      </a>
+
+      <!-- Gestión de escalafón -->
+      <a mat-list-item routerLink="/principal/gestion-escalafon">
+        <mat-icon>manage_accounts</mat-icon>
+        <span class="ml-2">Gestión de escalafón</span>
+      </a>
+
+      <!-- Configuración -->
+      <a mat-list-item>
+        <mat-icon>settings</mat-icon>
+        <span class="ml-2">Configuración</span>
+      </a>
+
+      <!-- Reportes -->
+      <a mat-list-item>
+        <mat-icon>assessment</mat-icon>
+        <span class="ml-2">Reportes</span>
+      </a>
+
+      <!-- Ver perfil -->
+      <a mat-list-item>
+        <mat-icon>account_circle</mat-icon>
+        <span class="ml-2">Ver perfil</span>
+      </a>
+
+      <!-- Cambiar de perfil -->
+      <a mat-list-item>
+        <mat-icon>switch_account</mat-icon>
+        <span class="ml-2">Cambiar de perfil</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+</mat-sidenav-container>
+  

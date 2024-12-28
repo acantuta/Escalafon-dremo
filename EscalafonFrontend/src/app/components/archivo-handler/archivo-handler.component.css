@@ -1,0 +1,32 @@
+.archivo-handler {
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+}
+
+.archivo-handler .mat-progress-bar {
+  height: 2px;
+}
+
+/* Ajustar el campo de folios para que se vea como los demás controles */
+.archivo-handler .mat-form-field {
+  margin-bottom: -1.25em;
+}
+
+.archivo-handler .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.archivo-handler .mat-form-field-flex {
+  align-items: center;
+}
+
+.archivo-handler .mat-form-field-infix {
+  padding: 0.5em 0;
+  border-top: 0;
+}
+
+::ng-deep .warning-snackbar {
+  background: #ffd740;
+  color: black;
+} 

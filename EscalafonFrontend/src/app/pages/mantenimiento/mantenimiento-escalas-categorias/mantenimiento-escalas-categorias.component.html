@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Escalas Categorías',
+    vista: {
+      nombre: 'esc.V_MantenimientoEscalasCategorias',
+      columnas: [
+        { campo: 'iEscCatId', label: 'ID', orden: 1 },
+        { campo: 'cRegLabNombre', label: 'Régimen Laboral', orden: 2 },
+        { campo: 'cEscCatNombre', label: 'Nombre de la Categoría', orden: 3 }
+      ]
+    },
+    tabla: 'esc.escalas_categorias',
+    dependencias: [
+      {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      iEscCatId: 'ID',
+      iRegLabId: 'Régimen Laboral',
+      cEscCatNombre: 'Nombre de la Categoría'
+    }
+  }">
+  </mantenimiento-dinamico-component>

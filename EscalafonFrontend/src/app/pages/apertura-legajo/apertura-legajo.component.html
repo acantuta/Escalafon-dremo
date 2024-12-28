@@ -1,0 +1,370 @@
+<!-- Contenedor principal -->
+<div class="p-4">
+  <!-- Título de la página -->
+  <h1 class="text-xl font-bold mb-4">Apertura de legajo</h1>
+
+  <!-- Formulario principal -->
+  <form [formGroup]="legajoForm">
+    <!-- Sección de búsqueda -->
+    <div class="flex gap-4 mb-6">
+      <mat-form-field class="flex-1">
+        <mat-label>Tipo de apertura</mat-label>
+        <mat-select formControlName="iTipoAperLegId">
+          <mat-option *ngFor="let tipo of tiposApertura" [value]="tipo.iTipoAperLegId">
+            {{ tipo.cTipoAperLegNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="flex-1">
+        <mat-label>Tipo de documento</mat-label>
+        <mat-select formControlName="iTipoIdentId">
+          <mat-option *ngFor="let tipo of tiposDocumentoIdentificacion" [value]="tipo.iTipoDocIdenId">
+            {{ tipo.cTipoDocIdenNombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="flex-1">
+        <mat-label>Número de documento</mat-label>
+        <input matInput formControlName="numeroDocumento" uppercase>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="button" (click)="buscarPersona()">BUSCAR</button>
+    </div>
+
+    <!-- Contenido que se muestra después de buscar -->
+    <ng-container *ngIf="mostrarFormulario">
+      <!-- Datos del servidor público -->
+      <mat-card class="mb-6">
+        <mat-card-header>
+          <mat-card-title>Datos del servidor público</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="grid grid-cols-5 gap-4">
+            <mat-form-field class="flex-1">
+              <mat-label>Primer apellido</mat-label>
+              <input matInput formControlName="cLegPrimerApellido" uppercase>
+              <mat-error *ngIf="legajoForm.get('cLegPrimerApellido')?.errors?.['required']">
+                El primer apellido es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Segundo apellido</mat-label>
+              <input matInput formControlName="cLegSegundoApellido" uppercase>
+              <mat-error *ngIf="legajoForm.get('cLegSegundoApellido')?.errors?.['required']">
+                El segundo apellido es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Nombres</mat-label>
+              <input matInput formControlName="cLegNombres" uppercase>
+              <mat-error *ngIf="legajoForm.get('cLegNombres')?.errors?.['required']">
+                Los nombres son requeridos
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput [matDatepicker]="fechaNacimiento" formControlName="dtLegFechaNacimiento">
+              <mat-datepicker-toggle matSuffix [for]="fechaNacimiento"></mat-datepicker-toggle>
+              <mat-datepicker #fechaNacimiento></mat-datepicker>
+              <mat-error *ngIf="legajoForm.get('dtLegFechaNacimiento')?.errors?.['required']">
+                La fecha de nacimiento es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Sexo</mat-label>
+              <mat-select formControlName="cLegSexo">
+                <mat-option *ngFor="let opcion of sexoOpciones" [value]="opcion.valor">
+                  {{ opcion.descripcion }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('cLegSexo')?.errors?.['required']">
+                El sexo es requerido
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Datos principales del documento -->
+      <mat-card class="mb-6">
+        <mat-card-header>
+          <mat-card-title>Datos principales del documento</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="grid grid-cols-3 gap-4">
+            <mat-form-field class="flex-1">
+              <mat-label>Tipo de documento</mat-label>
+              <mat-select formControlName="iTipoDocId">
+                <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+                  {{tipo.cTipoDocNombre}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iTipoDocId')?.errors?.['required']">
+                El tipo de documento es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Número de documento</mat-label>
+              <input matInput formControlName="cVincLabNumeroDocumento" uppercase>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Fecha de documento</mat-label>
+              <input matInput [matDatepicker]="fechaDocumento" formControlName="dtVincLabFechaDocumento">
+              <mat-datepicker-toggle matSuffix [for]="fechaDocumento"></mat-datepicker-toggle>
+              <mat-datepicker #fechaDocumento></mat-datepicker>
+            </mat-form-field>
+
+            <!-- Sección de documento y folios -->
+            <div class="col-span-3 grid grid-cols-3">
+              <div class="flex gap-4">
+                <app-archivo-handler
+                  [containerClass]="'w-full'"
+                  (archivo)="onArchivoSeleccionado($event)">
+                </app-archivo-handler>
+              </div>
+            </div>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Régimen laboral</mat-label>
+              <mat-select formControlName="iRegLabId">
+                <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+                  {{ regimen.cRegLabNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Acción</mat-label>
+              <mat-select formControlName="iAccVincId">
+                <mat-option *ngFor="let accion of accionesVinculacion" [value]="accion.iAccVincId">
+                  {{ accion.cAccVincNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="flex-1">
+              <mat-label>Motivo Acción</mat-label>
+              <mat-select formControlName="iMotAccVincId">
+                <mat-option *ngFor="let motivo of motivosAccionVinculacion" [value]="motivo.iMotAccVincId">
+                  {{ motivo.cMotAccVincNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Primer desplegable de Escala Categoría Grupo (editable) -->
+            <mat-form-field class="flex-1">
+              <mat-label>Escala Categoría Grupo</mat-label>
+              <mat-select formControlName="iEscCatId">
+                <mat-option *ngFor="let categoria of escalaCategorias" [value]="categoria.iEscCatId">
+                  {{ categoria.cEscCatNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="!legajoForm.get('iRegLabId')?.value">
+                Seleccione primero un régimen laboral
+              </mat-hint>
+              <mat-hint *ngIf="legajoForm.get('iRegLabId')?.value && !tieneEscalaCategoriaGrupo(legajoForm.get('iRegLabId')?.value)">
+                Este régimen no requiere escala categoría
+              </mat-hint>
+              <mat-error *ngIf="legajoForm.get('iEscCatId')?.errors?.['required'] && tieneEscalaCategoriaGrupo(legajoForm.get('iRegLabId')?.value)">
+                La escala categoría es requerida para este régimen
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Datos del centro laboral -->
+      <mat-card class="mb-6">
+        <mat-card-header>
+          <mat-card-title>Datos del centro laboral</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <!-- Información del centro educativo -->
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <mat-form-field>
+              <mat-label>Código modular IE</mat-label>
+              <input matInput formControlName="codigoModularIE" readonly>
+              <button mat-icon-button matSuffix (click)="buscarCentroLaboral()">
+                <mat-icon>search</mat-icon>
+              </button>
+            </mat-form-field>
+          </div>
+
+          <!-- Tabla de información -->
+          <table class="w-full mb-4" *ngIf="centroLaboralSeleccionado">
+            <tr>
+              <td class="font-bold">Centro laboral</td>
+              <td>{{centroLaboralSeleccionado.cCentLabNombre}}</td>
+              <td class="font-bold">Modalidad educativa</td>
+              <td>{{centroLaboralSeleccionado.cModEduNombre}}</td>
+            </tr>
+            <tr>
+              <td class="font-bold">Región</td>
+              <td>{{centroLaboralSeleccionado.cDirRegNombre}}</td>
+              <td class="font-bold">Instancia de gestión</td>
+              <td>{{centroLaboralSeleccionado.cInstGeEduNombre}}</td>
+            </tr>
+          </table>
+
+          <!-- Campos adicionales -->
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Condición laboral primero -->
+            <mat-form-field>
+              <mat-label>Condición Laboral</mat-label>
+              <mat-select formControlName="iCondLabId">
+                <mat-option *ngFor="let condicion of condicionesLaborales" [value]="condicion.iCondLabId">
+                  {{ condicion.cCondLabNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iCondLabId')?.errors?.['required']">
+                La condición laboral es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Situación laboral después -->
+            <mat-form-field>
+              <mat-label>Situación Laboral</mat-label>
+              <mat-select formControlName="iSitLabId">
+                <mat-option *ngFor="let situacion of situacionesLaborales" [value]="situacion.iSitLabId">
+                  {{ situacion.cSitLabNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="!legajoForm.get('iCondLabId')?.value">
+                Seleccione primero una condición laboral
+              </mat-hint>
+              <mat-error *ngIf="legajoForm.get('iSitLabId')?.errors?.['required']">
+                La situación laboral es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Régimen laboral -->
+            <mat-form-field>
+              <mat-label>Régimen laboral</mat-label>
+              <mat-select formControlName="iRegLabIdView">
+                <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+                  {{ regimen.cRegLabNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iRegLabIdView')?.errors?.['required']">
+                El régimen laboral es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Tipo de servidor -->
+            <mat-form-field>
+              <mat-label>Tipo de servidor</mat-label>
+              <mat-select formControlName="iTipoSerId">
+                <mat-option *ngFor="let tipo of tiposServidor" [value]="tipo.iTipoSerId">
+                  {{ tipo.cTipoSerNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iTipoSerId')?.errors?.['required']">
+                El tipo de servidor es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Escala / Categoría / Grupo -->
+            <mat-form-field>
+              <mat-label>Escala / Categoría / Grupo</mat-label>
+              <mat-select formControlName="iEscCatIdView">
+                <mat-option *ngFor="let categoria of escalaCategorias" [value]="categoria.iEscCatId">
+                  {{ categoria.cEscCatNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iEscCatIdView')?.errors?.['required']">
+                La escala/categoría es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Código plaza</mat-label>
+              <input matInput formControlName="cLegCodigoPlaza" uppercase>
+              <mat-error *ngIf="legajoForm.get('cLegCodigoPlaza')?.errors?.['required']">
+                El código de plaza es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Use / Zona / Subregión</mat-label>
+              <input matInput formControlName="cUseZonaSubRegion" uppercase>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="cLegCargo">
+                <mat-option *ngFor="let cargo of cargosLaborales" [value]="cargo.cCargLabNombre">
+                  {{ cargo.cCargLabNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('cLegCargo')?.errors?.['required']">
+                El cargo es requerido
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Jornada laboral</mat-label>
+              <mat-select formControlName="iJorLabId">
+                <mat-option *ngFor="let jornada of jornadasLaborales" [value]="jornada.iJorLabId">
+                  {{ jornada.cJorLabNombre }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="legajoForm.get('iJorLabId')?.errors?.['required']">
+                La jornada laboral es requerida
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Campos opcionales -->
+            <div class="flex items-center">
+              <mat-checkbox formControlName="bVincLabMandatoJudicial">¿Por mandato judicial?</mat-checkbox>
+            </div>
+
+            <mat-form-field>
+              <mat-label>Fecha de inicio</mat-label>
+              <input matInput [matDatepicker]="fechaInicio" formControlName="dtVincLabFechaInicio">
+              <mat-datepicker-toggle matSuffix [for]="fechaInicio"></mat-datepicker-toggle>
+              <mat-datepicker #fechaInicio></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Fecha fin</mat-label>
+              <input matInput [matDatepicker]="fechaFin" formControlName="dtVincLabFechaFin">
+              <mat-datepicker-toggle matSuffix [for]="fechaFin"></mat-datepicker-toggle>
+              <mat-datepicker #fechaFin></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field class="col-span-3">
+              <mat-label>Anotaciones</mat-label>
+              <textarea matInput formControlName="cLegAnotaciones" rows="4" uppercase></textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+
+    <!-- Botones de acción -->
+    <div class="flex justify-between">
+      <button mat-stroked-button routerLink="/principal/inicio">
+        <mat-icon>arrow_back</mat-icon>
+        RETORNAR
+      </button>
+      <div class="flex gap-2">
+        <button mat-stroked-button>
+          <mat-icon>cleaning_services</mat-icon>
+          LIMPIAR
+        </button>
+        <button mat-raised-button color="primary" (click)="guardarLegajo()">
+          <mat-icon>save</mat-icon>
+          GUARDAR
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

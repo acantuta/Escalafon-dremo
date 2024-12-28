@@ -1,0 +1,44 @@
+# Laravel & PHP (EscalafonBackend)
+EscalafonBackend/vendor/
+EscalafonBackend/node_modules/
+EscalafonBackend/.env
+EscalafonBackend/.phpunit.result.cache
+EscalafonBackend/storage/*.key
+EscalafonBackend/storage/framework/cache/data
+EscalafonBackend/storage/framework/sessions
+EscalafonBackend/storage/framework/testing
+EscalafonBackend/storage/framework/views
+EscalafonBackend/storage/logs
+EscalafonBackend/public/storage
+EscalafonBackend/public/hot
+EscalafonBackend/.vagrant
+EscalafonBackend/Homestead.yaml
+EscalafonBackend/Homestead.json
+
+# Angular (EscalafonFrontend)
+EscalafonFrontend/node_modules/
+EscalafonFrontend/dist/
+EscalafonFrontend/tmp/
+EscalafonFrontend/out-tsc/
+EscalafonFrontend/bazel-out/
+EscalafonFrontend/.angular/cache/
+EscalafonFrontend/16.2.16/angular-webpack/
+
+# IDEs and editors
+*.idea/
+*.project
+*.classpath
+*.c9/
+*.launch
+*.settings/
+*.sublime-workspace
+*.vscode/
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# System files
+.DS_Store
+Thumbs.db
+ScriptsGenerator/.env

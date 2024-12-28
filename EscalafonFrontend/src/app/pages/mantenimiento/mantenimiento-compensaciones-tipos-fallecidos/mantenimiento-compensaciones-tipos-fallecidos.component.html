@@ -1,0 +1,22 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Tipos de Fallecidos para Compensaciones',
+    vista: {
+      nombre: 'esc.compensaciones_tipos_fallecidos',
+      columnas: [
+        {
+          campo: 'iComTipFallId',
+          label: 'ID',
+          orden: 1
+        },
+        {
+          campo: 'cComTipFallNombre',
+          label: 'Nombre',
+          orden: 2
+        }
+      ]
+    },
+    tabla: 'esc.compensaciones_tipos_fallecidos',
+    labels: {
+    'cComTipFallNombre': 'Descripción del Tipo de Fallecido'
+  } 
+  }"></mantenimiento-dinamico-component>

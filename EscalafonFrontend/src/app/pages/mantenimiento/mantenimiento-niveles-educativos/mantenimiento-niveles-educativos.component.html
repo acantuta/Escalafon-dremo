@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Niveles Educativos',
+    vista: {
+      nombre: 'esc.V_MantenimientoNivelesEducativos',
+      columnas: [
+        { campo: 'iNivEduId', label: 'ID', orden: 1 },
+         { campo: 'cModEduNombre', label: 'Modalidad Educativa', orden: 2 },
+        { campo: 'iNivEduNombre', label: 'Nombre', orden: 3 }
+      ]
+    },
+    tabla: 'esc.niveles_educativos',
+    dependencias: [
+  {
+        campo: 'iModEduId',
+        tabla: 'esc.modalidades_educativas',
+        campoClave: 'iModEduId',
+        campoMostrar: 'cModEduNombre'
+      }
+    ],
+    labels: {
+      iNivEduId: 'ID',
+      iModEduId: 'Modalidad Educativa',
+      iNivEduNombre: 'Nombre del Nivel Educativo'
+    }
+  }">
+  </mantenimiento-dinamico-component>

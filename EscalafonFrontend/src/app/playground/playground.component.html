@@ -1,0 +1,25 @@
+<div class="p-4">
+  <app-centros-trabajo 
+    (centroLaboralSelected)="onCentroLaboralSelected($event)"
+    (centroLaboralIdSelected)="onCentroLaboralIdSelected($event)">
+  </app-centros-trabajo>
+
+  <!-- Mostrar datos del centro laboral seleccionado -->
+  <div *ngIf="centroLaboralSeleccionado" class="mt-4 p-4 border rounded-lg bg-gray-50">
+    <h2 class="text-lg font-bold mb-4">Centro Laboral Seleccionado:</h2>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <p class="text-600"><strong>ID:</strong> {{centroLaboralSeleccionado.iCentLabId}}</p>
+        <p><strong>Código Modular:</strong> {{centroLaboralSeleccionado.cCentLabCodigoModular}}</p>
+        <p><strong>Nombre:</strong> {{centroLaboralSeleccionado.cCentLabNombre}}</p>
+        <p><strong>DRE:</strong> {{centroLaboralSeleccionado.cDirRegNombre}}</p>
+      </div>
+      <div>
+        <p><strong>UGEL:</strong> {{centroLaboralSeleccionado.cInstGeEduNombre}}</p>
+        <p><strong>Modalidad:</strong> {{centroLaboralSeleccionado.cModEduNombre}}</p>
+        <p><strong>Nivel:</strong> {{centroLaboralSeleccionado.iNivEduNombre}}</p>
+        <p><strong>Vigente:</strong> {{centroLaboralSeleccionado.bCentLabEsVigente ? 'Sí' : 'No'}}</p>
+      </div>
+    </div>
+  </div>
+</div>

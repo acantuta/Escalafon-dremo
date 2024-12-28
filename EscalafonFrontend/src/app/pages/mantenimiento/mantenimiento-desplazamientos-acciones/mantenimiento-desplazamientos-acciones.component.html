@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Desplazamientos Acciones',
+    vista: {
+      nombre: 'esc.V_MantenimientoDesplazamientosAcciones',
+      columnas: [
+        { campo: 'iDespAccId', label: 'ID', orden: 1 },
+        { campo: 'cDespNombre', label: 'Nombre', orden: 2 },
+        { campo: 'cRegLabNombre', label: 'Régimen Laboral', orden: 3 }
+      ]
+    },
+    tabla: 'esc.desplazamientos_acciones',
+    dependencias: [
+      {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      iDespAccId: 'ID',
+      cDespNombre: 'Nombre de la Acción',
+      iRegLabId: 'Régimen Laboral'
+    }
+  }">
+  </mantenimiento-dinamico-component>

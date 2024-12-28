@@ -1,0 +1,411 @@
+<div [formGroup]="formacionForm" class="flex flex-col h-full">
+  <!-- Tabla con altura máxima y scroll -->
+  <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+    <div class="max-h-[400px] overflow-auto">
+      <table mat-table [dataSource]="dataSource" class="w-full">
+        <ng-container matColumnDef="numero">
+          <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap"> N° </th>
+          <td mat-cell *matCellDef="let i = index"> {{i + 1}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="nivelEducativo">
+          <th mat-header-cell *matHeaderCellDef class="whitespace-nowrap"> Nivel </th>
+          <td mat-cell *matCellDef="let formacion" class="min-w-[120px]"> {{formacion.cEduNivEdNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="centroEstudios">
+          <th mat-header-cell *matHeaderCellDef class="hidden sm:table-cell whitespace-nowrap"> Centro de Estudios </th>
+          <td mat-cell *matCellDef="let formacion" class="hidden sm:table-cell"> {{formacion.cFormAcadCentroEstudios}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="situacionAcademica">
+          <th mat-header-cell *matHeaderCellDef class="hidden md:table-cell whitespace-nowrap"> Situación </th>
+          <td mat-cell *matCellDef="let formacion" class="hidden md:table-cell"> {{formacion.cEduSitAcadNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="gradoAlcanzado">
+          <th mat-header-cell *matHeaderCellDef> Grado Alcanzado </th>
+          <td mat-cell *matCellDef="let formacion"> {{formacion.cEduGradAlcNombre}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="anioInicio">
+          <th mat-header-cell *matHeaderCellDef> Año Inicio </th>
+          <td mat-cell *matCellDef="let formacion"> {{formacion.iEduSitAcadAnioInicio}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="anioFin">
+          <th mat-header-cell *matHeaderCellDef> Año Fin </th>
+          <td mat-cell *matCellDef="let formacion"> {{formacion.iEduSitAcadAnioFin}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef class="w-[100px] whitespace-nowrap"> Acciones </th>
+          <td mat-cell *matCellDef="let formacion">
+            <div class="flex gap-1">
+              <button mat-icon-button 
+                      (click)="editarFormacion(formacion)" 
+                      matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      (click)="eliminarFormacion(formacion)" 
+                      matTooltip="Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      (click)="visualizarFormacion(formacion)" 
+                      matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Contenido en un contenedor con scroll -->
+  <div class="flex-1 overflow-auto">
+    <!-- Card: Datos de formación académica -->
+    <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+      <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos de formación académica</h2>
+      
+      <!-- Primera fila -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+        <mat-form-field>
+          <mat-label>Nivel educativo</mat-label>
+          <mat-select formControlName="iEduNivEdId">
+            <mat-option *ngFor="let nivel of nivelesEducativos" [value]="nivel.iEduNivEdId">
+              {{ nivel.cEduNivEdNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="formacionForm.get('iEduNivEdId')?.errors?.['required'] && 
+                            formacionForm.get('iEduNivEdId')?.touched">
+            El nivel educativo es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="isSecundaria">
+          <mat-label>Secundaria</mat-label>
+          <mat-select formControlName="iEduTipoSecId">
+            <mat-option *ngFor="let tipo of tiposSecundaria" [value]="tipo.iEduTipoSecId">
+              {{ tipo.cEduTipoSecId }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field *ngIf="isSuperior">
+          <mat-label>Superior</mat-label>
+          <mat-select formControlName="iEduTipSupId">
+            <mat-option *ngFor="let tipo of tiposEducacionSuperior" [value]="tipo.iEduTipSupId">
+              {{ tipo.cEduTipSupNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Segunda fila: Centro de Estudios -->
+      <div class="grid grid-cols-1 gap-2 sm:gap-4 mb-2 sm:mb-4">
+        <mat-form-field class="w-full">
+          <mat-label>Centro de Estudios</mat-label>
+          <input matInput 
+                 formControlName="cFormAcadCentroEstudios" 
+                 placeholder="Ingrese el centro de estudios"
+                 uppercase>
+          <mat-error *ngIf="formacionForm.get('cFormAcadCentroEstudios')?.errors?.['required'] && 
+                            formacionForm.get('cFormAcadCentroEstudios')?.touched">
+            El centro de estudios es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tercera fila: País y ubicación -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+        <mat-form-field class="w-full">
+          <mat-label>País</mat-label>
+          <mat-select formControlName="iPaisId">
+            <mat-option *ngFor="let pais of paises" [value]="pais.iPaisId">
+              {{ pais.cPaisNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="col-span-1 sm:col-span-2">
+          <mat-form-field *ngIf="formacionForm.get('iPaisId')?.value !== defaultPaisId" 
+                          class="w-full">
+            <mat-label>Ciudad</mat-label>
+            <input matInput 
+                   formControlName="cFormAcadCiudad"
+                   uppercase>
+          </mat-form-field>
+
+          <div *ngIf="formacionForm.get('iPaisId')?.value === defaultPaisId" 
+               class="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
+            <mat-form-field class="w-full">
+              <mat-label>Departamento</mat-label>
+              <mat-select formControlName="iDptoId">
+                <mat-option *ngFor="let dpto of departamentos" [value]="dpto.iDptoId">
+                  {{ dpto.cDptoNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="w-full">
+              <mat-label>Provincia</mat-label>
+              <mat-select formControlName="iPrvnId">
+                <mat-option *ngFor="let prov of provincias" [value]="prov.iPrvnId">
+                  {{ prov.cPrvnNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="w-full">
+              <mat-label>Distrito</mat-label>
+              <mat-select formControlName="iDsttId">
+                <mat-option *ngFor="let dist of distritos" [value]="dist.iDsttId">
+                  {{ dist.cDsttNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: Datos de estudio -->
+    <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+      <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos de estudio</h2>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+        <mat-form-field class="w-full">
+          <mat-label>Situación académica</mat-label>
+          <mat-select formControlName="iEduSitAcadId">
+            <mat-option *ngFor="let situacion of situacionesAcademicas" [value]="situacion.iEduSitAcadId">
+              {{ situacion.cEduSitAcadNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="formacionForm.get('iEduSitAcadId')?.errors?.['required'] && 
+                            formacionForm.get('iEduSitAcadId')?.touched">
+            La situación académica es requerida
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Grado alcanzado solo visible para superior posgrado -->
+        <mat-form-field class="w-full" *ngIf="mostrarGradoAlcanzado">
+          <mat-label>Grado alcanzado/ Nivel</mat-label>
+          <mat-select formControlName="iEduGradAlcId">
+            <mat-option *ngFor="let grado of gradosAlcanzados" [value]="grado.iEduGradAlcId">
+              {{ grado.cEduGradAlcNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Año de inicio</mat-label>
+          <mat-select formControlName="iEduSitAcadAnioInicio">
+            <mat-option *ngFor="let anio of anios" [value]="anio">
+              {{ anio }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="formacionForm.get('iEduSitAcadAnioInicio')?.errors?.['required'] && 
+                            formacionForm.get('iEduSitAcadAnioInicio')?.touched">
+            El año de inicio es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Año final</mat-label>
+          <mat-select formControlName="iEduSitAcadAnioFin">
+            <mat-option *ngFor="let anio of anios" [value]="anio">
+              {{ anio }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="formacionForm.get('iEduSitAcadAnioFin')?.errors?.['required'] && 
+                            formacionForm.get('iEduSitAcadAnioFin')?.touched">
+            El año final es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Card: Especialidad -->
+    <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+      <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Especialidad</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+        <mat-form-field>
+          <mat-label>Nivel</mat-label>
+          <mat-select formControlName="iEduNivEspId" [disabled]="!mostrarNivelEspecialidad">
+            <mat-option *ngFor="let nivel of nivelesEspecialidad" [value]="nivel.iEduNivEspId">
+              {{ nivel.cEduNivEspNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Carrera</mat-label>
+          <mat-select formControlName="iEduCarrId">
+            <mat-option *ngFor="let carrera of carreras" [value]="carrera.iEduCarrId">
+              {{ carrera.cEduCarrNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Programa general</mat-label>
+          <mat-select formControlName="iEduProGenId">
+            <mat-option *ngFor="let programa of programasGenerales" [value]="programa.iEduProGenId">
+              {{ programa.cEduProGenNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Programa Profesional</mat-label>
+          <mat-select formControlName="iEduProProfId">
+            <mat-option *ngFor="let programa of programasProfesionales" [value]="programa.iEduProProfId">
+              {{ programa.cEduProProfNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Programa</mat-label>
+          <mat-select formControlName="iEduProId">
+            <mat-option *ngFor="let programa of programas" [value]="programa.iEduProId">
+              {{ programa.cEduProNombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Card: Datos del título y el registro -->
+    <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+      <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Datos del título y el registro</h2>
+      
+      <!-- Primera fila -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+        <mat-form-field>
+          <mat-label>Título</mat-label>
+          <input matInput 
+                 formControlName="cFormAcadTitulo"
+                 uppercase>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Especialidad</mat-label>
+          <input matInput 
+                 formControlName="cFormAcadEspecialidad"
+                 uppercase>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha de expedición</mat-label>
+          <input matInput [matDatepicker]="expedicionPicker" formControlName="dtFormAcadFechaExpedicion">
+          <mat-datepicker-toggle matSuffix [for]="expedicionPicker"></mat-datepicker-toggle>
+          <mat-datepicker #expedicionPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <!-- Tipo de centro -->
+      <div class="mb-2 sm:mb-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+          <span class="text-gray-600">Tipo de centro:</span>
+          <mat-radio-group formControlName="iEduCentRegId" class="flex flex-col sm:flex-row gap-2 sm:gap-4">
+            <mat-radio-button *ngFor="let tipo of tiposCentro" [value]="tipo.iEduTipCentId">
+              {{ tipo.cEduTipCentNombre }}
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <!-- Segunda fila -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 mb-2 sm:mb-4">
+        <mat-form-field>
+          <mat-label>Centro de registro</mat-label>
+          <input matInput 
+                 formControlName="cFormAcadCentroRegistro"
+                 uppercase>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Nro de registro</mat-label>
+          <input matInput 
+                 formControlName="cFormAcadNumeroRegistro"
+                 uppercase>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Fecha de registro</mat-label>
+          <input matInput [matDatepicker]="registroPicker" formControlName="dtFormAcadFechaRegistro">
+          <mat-datepicker-toggle matSuffix [for]="registroPicker"></mat-datepicker-toggle>
+          <mat-datepicker #registroPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field class="w-full">
+        <mat-label>Número de resolución</mat-label>
+        <input matInput 
+               formControlName="cFormAcadNumeroDocumento"
+               uppercase>
+      </mat-form-field>
+    </div>
+
+    <!-- Card: Documento -->
+    <div class="border rounded-lg p-2 sm:p-4 mb-2 sm:mb-4">
+      <h2 class="text-lg sm:text-xl font-medium mb-2 sm:mb-4">Documento</h2>
+      <app-archivo-handler
+        [containerClass]="'w-full'" 
+        [required]="true"
+        [allowedExtensions]="['.pdf']"
+        [maxFileSize]="2"
+        [archivoId]="formacionForm.get('iArchId')?.value"
+        (archivoSeleccionado)="onArchivoSelected($event)">
+      </app-archivo-handler>
+    </div>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="sticky bottom-0 bg-white border-t mt-2 sm:mt-4 py-2 sm:py-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4">
+      <!-- Modo visualización -->
+      <div *ngIf="modoVisualizacion" class="w-full flex justify-end">
+        <button mat-stroked-button 
+                class="w-full sm:w-auto"
+                (click)="cerrarVisualizacion()">
+          <mat-icon>close</mat-icon>
+          Cerrar
+        </button>
+      </div>
+
+      <!-- Modo normal -->
+      <ng-container *ngIf="!modoVisualizacion">
+        <button mat-stroked-button 
+                class="w-full sm:w-auto"
+                routerLink="legajo/principal">
+          <mat-icon>arrow_back</mat-icon>
+          Retornar
+        </button>
+
+        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
+          <button mat-stroked-button 
+                  class="w-full sm:w-auto"
+                  (click)="limpiar()">
+            <mat-icon>cleaning_services</mat-icon>
+            Limpiar
+          </button>
+          <button mat-raised-button 
+                  color="primary"
+                  class="w-full sm:w-auto"
+                  (click)="guardar()">
+            <mat-icon>save</mat-icon>
+            Guardar
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div> 

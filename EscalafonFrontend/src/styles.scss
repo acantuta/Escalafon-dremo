@@ -1,0 +1,58 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+// Definir paleta personalizada
+$paleta-principal: (
+    50: #fce4e7,
+    100: #f8bcc3,
+    200: #f3909c,
+    300: #ee6474,
+    400: #ea4256,
+    500: #b51529,  // color principal (181, 21, 41)
+    600: #a81326,
+    700: #981021,
+    800: #890e1d,
+    900: #6d0b17,
+    contrast: (
+        50: rgba(black, 0.87),
+        100: rgba(black, 0.87),
+        200: rgba(black, 0.87),
+        300: white,
+        400: white,
+        500: white,
+        600: white,
+        700: white,
+        800: white,
+        900: white,
+    )
+);
+
+// Definir las paletas de colores
+$color-principal: mat.define-palette($paleta-principal, 500);
+$color-secundario: mat.define-palette(mat.$gray-palette, A200, A100, A400);
+$color-advertencia: mat.define-palette(mat.$red-palette);
+
+// Crear el tema
+$mi-tema: mat.define-light-theme((
+  color: (
+    primary: $color-principal,
+    accent: $color-secundario,
+    warn: $color-advertencia,
+  )
+));
+
+// Aplicar el tema
+@include mat.all-component-themes($mi-tema);
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+// Estilos para mensajes de error
+.mensaje-error {
+    &.mat-mdc-snack-bar-container {
+        --mdc-snackbar-container-color: #f44336;
+        --mat-mdc-snack-bar-button-color: #fff;
+        --mdc-snackbar-supporting-text-color: #fff;
+    }
+} 

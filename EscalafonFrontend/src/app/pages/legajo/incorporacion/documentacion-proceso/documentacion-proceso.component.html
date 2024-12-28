@@ -1,0 +1,110 @@
+<!-- Tabla de documentos -->
+<table mat-table [dataSource]="documentos" class="w-full">
+  <!-- Columna N° -->
+  <ng-container matColumnDef="numero">
+    <th mat-header-cell *matHeaderCellDef> N° </th>
+    <td mat-cell *matCellDef="let i = index"> {{i + 1}} </td>
+  </ng-container>
+
+  <!-- Columna Tipo de documento -->
+  <ng-container matColumnDef="tipoDocumento">
+    <th mat-header-cell *matHeaderCellDef> TIPO DE DOCUMENTO </th>
+    <td mat-cell *matCellDef="let documento"> {{documento.cIncorTipDocNombre}} </td>
+  </ng-container>
+
+  <!-- Columna F. Emisión -->
+  <ng-container matColumnDef="fEmision">
+    <th mat-header-cell *matHeaderCellDef> F. EMISIÓN </th>
+    <td mat-cell *matCellDef="let documento"> {{documento.dIncorDocFechEmision | date:'dd/MM/yyyy'}} </td>
+  </ng-container>
+
+  <!-- Columna Acciones -->
+  <ng-container matColumnDef="acciones">
+    <th mat-header-cell *matHeaderCellDef class="w-[120px]"> ACCIONES </th>
+    <td mat-cell *matCellDef="let documento" class="whitespace-nowrap">
+      <div class="flex gap-1">
+        <button mat-icon-button (click)="editarDocumento(documento)" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="eliminarDocumento(documento.iIncorDocId)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button (click)="visualizarDocumento(documento)" matTooltip="Visualizar">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<!-- Sección de carga de archivo -->
+<div class="border rounded p-4 mt-4" *ngIf="formularioVisible">
+  <h2 class="text-sm font-medium text-gray-900 mb-4">Carga de archivo</h2>
+  
+  <form [formGroup]="documentacionForm" (ngSubmit)="guardarDocumento()">
+    <div class="grid grid-cols-2 gap-4 mb-4">
+      <!-- Tipo de documento -->
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Tipo de documento</mat-label>
+        <mat-select formControlName="iIncorTipDocId">
+          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iIncorTipDocId">
+            {{tipo.cIncorTipDocNombre}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="documentacionForm.get('iIncorTipDocId')?.hasError('required')">
+          El tipo de documento es requerido
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Fecha de emisión -->
+      <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Fecha de emisión</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="dIncorDocFechEmision">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Componente de manejo de archivos -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Archivo *
+      </label>
+      <app-archivo-handler
+        [maxFileSize]="2"
+        [allowedExtensions]="['.pdf']"
+        [archivoId]="documentacionForm.get('iArchId')?.value"
+        [containerClass]="'w-1/2'"
+        [required]="true"
+        (archivoSeleccionado)="onArchivoSeleccionado($event)"
+        (iArchId)="onArchivoId($event)">
+      </app-archivo-handler>
+      <mat-error *ngIf="documentacionForm.get('iArchId')?.hasError('required') && 
+                        documentacionForm.get('iArchId')?.touched"
+                class="mt-1">
+        Debe seleccionar un archivo PDF
+      </mat-error>
+    </div>
+
+    <!-- Anotaciones -->
+    <mat-form-field appearance="fill" class="w-full">
+      <mat-label>Anotaciones</mat-label>
+      <textarea matInput rows="4" formControlName="cIncorDocAnotaciones" uppercase></textarea>
+    </mat-form-field>
+
+    <!-- Botones de acción -->
+    <div class="flex justify-end gap-2 mt-4">
+      <button mat-button type="button" (click)="limpiarFormulario()">
+        {{ modoFormulario === 'ver' ? 'CERRAR' : 'LIMPIAR' }}
+      </button>
+      <button mat-raised-button color="primary" type="submit" 
+              *ngIf="modoFormulario !== 'ver'">
+        GUARDAR
+      </button>
+    </div>
+
+  </form>
+</div> 

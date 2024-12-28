@@ -1,0 +1,36 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: 6) Compensaciones / Categorías Remunerativas',
+  vista: {
+    nombre: 'esc.V_MantenimientoCategoriasRemunerativas',
+    columnas: [
+      {
+        campo: 'iCatRemuId',
+        label: 'ID',
+        orden: 1
+      },
+      {
+        campo: 'cGrupOcupNombre',
+        label: 'Grupo ocupacional',
+        orden: 2
+      },
+      {
+        campo: 'cCatRemuNombre',
+        label: 'Nombre',
+        orden: 3
+      }
+    ]
+  },
+  tabla: 'esc.categorias_remunerativas',
+  labels: {
+    'cCatRemuNombre': 'Nombre de la Categoría',
+    'iGrupOcupId': 'Grupo ocupacional'
+  },
+  dependencias: [
+    {
+      campo: 'iGrupOcupId',
+      tabla: 'esc.grupos_ocupacionales',
+      campoClave: 'iGrupOcupId',
+      campoMostrar: 'cGrupOcupNombre'
+    }
+  ]
+}"></mantenimiento-dinamico-component> 

@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Reconocimientos Méritos',
+    vista: {
+      nombre: 'esc.V_MantenimientoReconocimientosMeritos',
+      columnas: [
+        { campo: 'iRecoMerId', label: 'ID', orden: 1 },
+        { campo: 'cRecoTipMerNombre', label: 'Tipo de Mérito', orden: 2 },
+        { campo: 'cRecoMerNombre', label: 'Nombre del Mérito', orden: 3 }
+      ]
+    },
+    tabla: 'esc.reconocimientos_meritos',
+    dependencias: [
+      {
+        campo: 'iRecoTipMerId',
+        tabla: 'esc.reconocimientos_tipos_meritos',
+        campoClave: 'iRecoTipMerId',
+        campoMostrar: 'cRecoTipMerNombre'
+      }
+    ],
+    labels: {
+      iRecoMerId: 'ID',
+      iRecoTipMerId: 'Tipo de Mérito',
+      cRecoMerNombre: 'Nombre del Mérito'
+    }
+  }">
+  </mantenimiento-dinamico-component>

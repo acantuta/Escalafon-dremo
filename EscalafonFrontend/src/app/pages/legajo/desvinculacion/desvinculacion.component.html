@@ -1,0 +1,23 @@
+<div class="p-4">
+  <!-- Reemplazamos la información del empleado con el componente servidor-publico -->
+  <app-servidor-publico></app-servidor-publico>
+
+  <!-- Sistema de pestañas -->
+  <mat-tab-group class="mt-4">
+    <!-- Pestaña: Sistema pensionario -->
+    <mat-tab label="Sistema pensionario">
+      <div class="py-4">
+        <app-sistema-pensionario></app-sistema-pensionario>
+      </div>
+    </mat-tab>
+
+    <!-- Pestaña: Ceses -->
+    <mat-tab label="Ceses">
+      <div class="py-4">
+        <app-ceses></app-ceses>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <!-- Eliminar los botones duplicados ya que cada componente tiene sus propios botones -->
+</div>

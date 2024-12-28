@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Evaluaciones Desempeños Acciones',
+    vista: {
+      nombre: 'esc.V_MantenimientoEvaluacionesDesempeniosAcciones',
+      columnas: [
+        { campo: 'iEvalDesAccId', label: 'ID', orden: 1 },
+        { campo: 'cRegLabNombre', label: 'Régimen Laboral', orden: 2 },      
+        { campo: 'cEvalDesAccNombre', label: 'Nombre de la Acción', orden: 3 }
+      ]
+    },
+    tabla: 'esc.evaluaciones_desempenios_acciones',
+    dependencias: [
+      {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      iEvalDesAccId: 'ID',
+      iRegLabId: 'Régimen Laboral',
+      cEvalDesAccNombre: 'Nombre de la Acción'
+    }
+  }">
+  </mantenimiento-dinamico-component>

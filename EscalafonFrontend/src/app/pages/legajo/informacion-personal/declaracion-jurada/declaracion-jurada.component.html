@@ -1,0 +1,150 @@
+<div class="p-4">
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="flex justify-center p-4">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Mensaje cuando no hay tipos de documento -->
+  <div *ngIf="!loading && !tiposDocumento.length" class="text-center p-4 bg-yellow-100 text-yellow-700 rounded mb-4">
+    No se han cargado los tipos de documento. Por favor, intente nuevamente.
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!loading">
+    <!-- Tabla de registros -->
+    <table mat-table [dataSource]="dataSource" class="w-full mb-4 bg-white shadow-sm">
+      <!-- Columna N° -->
+      <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef class="w-[5%]"> N° </th>
+        <td mat-cell *matCellDef="let row; let i = index"> 
+          {{ i + 1 + (paginator.pageIndex * paginator.pageSize) }}
+        </td>
+      </ng-container>
+
+      <!-- Columna Tipo de documento -->
+      <ng-container matColumnDef="tipoDocumento">
+        <th mat-header-cell *matHeaderCellDef class="w-[26.67%]"> TIPO DE DOCUMENTO </th>
+        <td mat-cell *matCellDef="let row">
+          {{ obtenerNombreTipoDocumento(row.iInfoPeFamDecTipId) }}
+        </td>
+      </ng-container>
+
+      <!-- Columna Fecha de emisión -->
+      <ng-container matColumnDef="fechaEmision">
+        <th mat-header-cell *matHeaderCellDef class="w-[26.67%]"> FECHA DE EMISIÓN </th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.dtInfoPeFamDecFechaEmision | date:'dd/MM/yyyy' }}
+        </td>
+      </ng-container>
+
+      <!-- Columna Anotaciones -->
+      <ng-container matColumnDef="anotaciones">
+        <th mat-header-cell *matHeaderCellDef class="w-[26.67%]"> ANOTACIONES </th>
+        <td mat-cell *matCellDef="let row">
+          {{ row.cInfoPeFamDecAnotaciones }}
+        </td>
+      </ng-container>
+
+      <!-- Columna Acciones -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="w-[15%]"> ACCIONES </th>
+        <td mat-cell *matCellDef="let row">
+          <div class="flex gap-1">
+            <button mat-icon-button 
+                    (click)="editarDeclaracion(row)"
+                    matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    (click)="eliminarDeclaracion(row)"
+                    matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button mat-icon-button 
+                    (click)="visualizarDeclaracion(row)"
+                    matTooltip="Visualizar">
+              <mat-icon>visibility</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[5, 10, 25]" showFirstLastButtons></mat-paginator>
+
+    <!-- Formulario -->
+    <div class="border rounded-lg p-4 mt-4">
+      <h2 class="text-xl font-medium mb-4">Declaración jurada</h2>
+
+      <form [formGroup]="declaracionForm" (ngSubmit)="guardarDeclaracion()">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <mat-form-field class="w-full">
+            <mat-label>Tipo de documento</mat-label>
+            <mat-select formControlName="iInfoPeFamDecTipId" [disabled]="!tiposDocumento.length">
+              <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iInfoPeFamDecTipId">
+                {{ tipo.cInfoPeFamDecTipNombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="(declaracionForm.get('iInfoPeFamDecTipId')?.touched || submitted) && declaracionForm.get('iInfoPeFamDecTipId')?.errors?.['required']">
+              El tipo de documento es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Fecha de emisión</mat-label>
+            <input matInput [matDatepicker]="fechaEmisionPicker" formControlName="dtInfoPeFamDecFechaEmision">
+            <mat-datepicker-toggle matSuffix [for]="fechaEmisionPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fechaEmisionPicker></mat-datepicker>
+            <mat-error *ngIf="(declaracionForm.get('dtInfoPeFamDecFechaEmision')?.touched || submitted) && declaracionForm.get('dtInfoPeFamDecFechaEmision')?.errors?.['required']">
+              La fecha de emisión es requerida
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="mb-4">
+          <mat-form-field class="w-full">
+            <mat-label>Anotaciones</mat-label>
+            <textarea matInput rows="3" formControlName="cInfoPeFamDecAnotaciones" uppercase></textarea>
+          </mat-form-field>
+        </div>
+
+        <!-- Reemplazar el botón documento y folios por el componente archivo-handler -->
+        <div class="mb-4">
+          <app-archivo-handler
+            [archivoId]="declaracionForm.get('iArchivoId')?.value"
+            (archivoSeleccionado)="onArchivoSeleccionado($event)"
+            [required]="false"
+            [allowedExtensions]="['.pdf']"
+            [maxFileSize]="2"
+            containerClass="w-full">
+          </app-archivo-handler>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex justify-end">
+          <button mat-stroked-button 
+                  type="button" 
+                  (click)="limpiarFormulario()"
+                  *ngIf="modoFormulario !== 'ver'">
+            LIMPIAR
+          </button>
+          <button mat-raised-button 
+                  color="primary" 
+                  type="submit"
+                  *ngIf="modoFormulario !== 'ver'">
+            GUARDAR
+          </button>
+          <button mat-stroked-button 
+                  type="button" 
+                  (click)="limpiarFormulario()"
+                  *ngIf="modoFormulario === 'ver'">
+            CERRAR
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div> 

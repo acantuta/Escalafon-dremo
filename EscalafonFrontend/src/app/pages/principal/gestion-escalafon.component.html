@@ -1,0 +1,62 @@
+<div class="mat-app-background min-h-screen flex flex-col overflow-auto">
+  <mat-toolbar color="primary" class="flex justify-between items-center flex-shrink-0 h-14">
+    <div class="h-full flex items-center gap-4 p-1">
+      <a routerLink="/principal/inicio" class="h-full bg-white h-full w-auto rounded p-1">
+        <img src="assets/images/logo.png" alt="Logo Moquegua" class="h-full w-auto">
+      </a>
+      <a routerLink="/principal/inicio">ESCALAFÓN</a>
+    </div>
+
+    <!-- Add user menu here -->
+    <div class="relative">
+      <button 
+        (click)="toggleUserMenu()" 
+        class="flex items-center space-x-2 text-white hover:bg-white/10 px-3 h-10 rounded-lg"
+      >
+        <mat-icon>account_circle</mat-icon>
+        <span>{{ userName }}</span>
+      </button>
+
+      <!-- Floating menu -->
+      <div 
+        *ngIf="isUserMenuOpen" 
+        class="absolute right-0 mt-0.5 w-72 rounded-lg shadow-lg bg-white z-50 overflow-hidden"
+        @fadeAnimation
+      >
+        <div class="bg-primary-700 h-12 px-4 flex items-center space-x-3">
+          <mat-icon class="text-white text-3xl">account_circle</mat-icon>
+          <div class="flex-grow">
+            <p class="text-white font-medium">{{ userName }}</p>
+            <p class="text-white/80 text-sm">Configuraciones</p>
+          </div>
+          <button class="text-white hover:bg-white/10 p-1.5 rounded-full">
+            <mat-icon>settings</mat-icon>
+          </button>
+        </div>
+        <div>
+          <ng-container *ngIf="tieneAccesoMantenimiento">
+            <button 
+              routerLink="/principal/mantenimiento"
+              class="w-full text-left px-4 h-9 text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+            >
+              <mat-icon>settings</mat-icon>
+              <span>Mantenimiento</span>
+            </button>
+          </ng-container>
+          <div class="h-[1px] bg-gray-200"></div>
+          <button 
+            (click)="cerrarSesion()" 
+            class="w-full text-left px-4 h-9 text-red-600 hover:bg-gray-100 flex items-center space-x-2"
+          >
+            <mat-icon>logout</mat-icon>
+            <span>CERRAR SESIÓN</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <div class="flex-1 overflow-auto">
+    <router-outlet></router-outlet>
+  </div>
+</div>

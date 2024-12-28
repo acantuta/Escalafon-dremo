@@ -1,0 +1,27 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Desplazamientos Motivos Acciones',
+    vista: {
+      nombre: 'esc.V_MantenimientoDesplazamientosMotivosAcciones',
+      columnas: [
+        { campo: 'iDespMotAccId', label: 'ID', orden: 1 },
+        { campo: 'cDespNombre', label: 'Nombre', orden: 2 },
+        { campo: 'cDespAccNombre', label: 'Acción', orden: 3}
+      ]
+    },
+    tabla: 'esc.desplazamientos_motivos_acciones',
+    dependencias: [
+      {
+        campo: 'iDespAccId',
+        tabla: 'esc.desplazamientos_acciones',
+        campoClave: 'iDespAccId',
+        campoMostrar: 'cDespNombre'
+      }
+    ],
+    labels: {
+      iDespMotAccId: 'ID',
+      cDespNombre: 'Nombre del Motivo',
+      iDespAccId: 'Acción de Desplazamiento'
+    }
+  }">
+  
+  </mantenimiento-dinamico-component>

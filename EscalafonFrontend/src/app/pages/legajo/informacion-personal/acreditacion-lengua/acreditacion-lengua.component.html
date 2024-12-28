@@ -1,0 +1,149 @@
+<div class="p-4">
+    <!-- Tabla de listado de idiomas acreditados -->
+    <table mat-table [dataSource]="dataSource" class="w-full mb-4">
+        <!-- Columna N° -->
+        <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef> N° </th>
+            <td mat-cell *matCellDef="let row; let i = index"> 
+                {{ i + 1 + paginator.pageIndex * paginator.pageSize }}
+            </td>
+        </ng-container>
+
+        <!-- Columna Idioma -->
+        <ng-container matColumnDef="idioma">
+            <th mat-header-cell *matHeaderCellDef> IDIOMA </th>
+            <td mat-cell *matCellDef="let row"> {{row.cAcredIdioma}} </td>
+        </ng-container>
+
+        <!-- Columna Dominio escritura -->
+        <ng-container matColumnDef="dominioEscritura">
+            <th mat-header-cell *matHeaderCellDef> DOMINIO ESCRITURA </th>
+            <td mat-cell *matCellDef="let row"> {{row.cAcredDominioEscritura}} </td>
+        </ng-container>
+
+        <!-- Columna Dominio oral -->
+        <ng-container matColumnDef="dominioOral">
+            <th mat-header-cell *matHeaderCellDef> DOMINIO ORAL </th>
+            <td mat-cell *matCellDef="let row"> {{row.cAcredDominioOral}} </td>
+        </ng-container>
+
+        <!-- Columna Año ingreso -->
+        <ng-container matColumnDef="anioIngreso">
+            <th mat-header-cell *matHeaderCellDef> AÑO INGRESO </th>
+            <td mat-cell *matCellDef="let row"> {{row.iAcredAnioIngreso}} </td>
+        </ng-container>
+
+        <!-- Columna Año evaluación -->
+        <ng-container matColumnDef="anioEvaluacion">
+            <th mat-header-cell *matHeaderCellDef> AÑO EVALUACIÓN </th>
+            <td mat-cell *matCellDef="let row"> {{row.iAcredAnioEvaluacion}} </td>
+        </ng-container>
+
+        <!-- Columna Año vencimiento -->
+        <ng-container matColumnDef="anioVencimiento">
+            <th mat-header-cell *matHeaderCellDef> AÑO VENCIMIENTO </th>
+            <td mat-cell *matCellDef="let row"> {{row.iAcredAnioVencimiento}} </td>
+        </ng-container>
+
+        <!-- Columna Estado -->
+        <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> ESTADO </th>
+            <td mat-cell *matCellDef="let row"> {{row.estado}} </td>
+        </ng-container>
+
+        <!-- Columna Acciones -->
+        <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+            <td mat-cell *matCellDef="let row">
+                <div class="flex gap-1">
+                    <button mat-icon-button (click)="editarAcreditacion(row)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="eliminarAcreditacion(row)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator 
+        [pageSizeOptions]="[5, 10, 25]"
+        [pageSize]="10"
+        showFirstLastButtons>
+    </mat-paginator>
+
+    <!-- Formulario de acreditación -->
+    <div class="border rounded-lg p-4">
+        <h2 class="text-xl font-medium mb-4">Acreditación de lengua nativa</h2>
+
+        <form [formGroup]="acreditacionForm" (ngSubmit)="guardarAcreditacion()">
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Idioma</mat-label>
+                    <input matInput formControlName="cAcredIdioma">
+                    <mat-error *ngIf="(acreditacionForm.get('cAcredIdioma')?.touched || submitted) && acreditacionForm.get('cAcredIdioma')?.errors?.['required']">
+                        El idioma es requerido
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Dominio escritura</mat-label>
+                    <mat-select formControlName="cAcredDominioEscritura">
+                        <mat-option value="basico">Básico</mat-option>
+                        <mat-option value="intermedio">Intermedio</mat-option>
+                        <mat-option value="avanzado">Avanzado</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="(acreditacionForm.get('cAcredDominioEscritura')?.touched || submitted) && acreditacionForm.get('cAcredDominioEscritura')?.errors?.['required']">
+                        El dominio de escritura es requerido
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Dominio oral</mat-label>
+                    <mat-select formControlName="cAcredDominioOral">
+                        <mat-option value="basico">Básico</mat-option>
+                        <mat-option value="intermedio">Intermedio</mat-option>
+                        <mat-option value="avanzado">Avanzado</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Año de ingreso</mat-label>
+                    <input matInput type="number" formControlName="iAcredAnioIngreso">
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Año de evaluación</mat-label>
+                    <input matInput type="number" formControlName="iAcredAnioEvaluacion">
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Año de vencimiento</mat-label>
+                    <input matInput type="number" formControlName="iAcredAnioVencimiento">
+                </mat-form-field>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-between mt-6">
+                <button mat-stroked-button type="button" routerLink="/principal/inicio">
+                    <mat-icon>arrow_back</mat-icon>
+                    RETORNAR
+                </button>
+                <div class="flex gap-2">
+                    <button mat-stroked-button type="button" (click)="limpiarFormulario()">
+                        LIMPIAR
+                    </button>
+                    <button mat-raised-button color="primary" type="submit">
+                        GUARDAR
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div> 

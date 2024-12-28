@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Educación Programas Generales',
+    vista: {
+      nombre: 'esc.V_MantenimientoEducacionProgramasGenerales',
+      columnas: [
+        { campo: 'iEduProGenId', label: 'ID', orden: 1 },
+        { campo: 'cEduCarrNombre', label: 'Carrera', orden: 2 },
+        { campo: 'cEduProGenNombre', label: 'Nombre', orden: 3 }
+      ]
+    },
+    tabla: 'esc.educacion_programas_generales',
+    dependencias: [
+      {
+        campo: 'iEduCarrId',
+        tabla: 'esc.educacion_carreras',
+        campoClave: 'iEduCarrId',
+        campoMostrar: 'cEduCarrNombre'
+      }
+    ],
+    labels: {
+      iEduProGenId: 'ID',
+      iEduCarrId: 'Carrera',
+      cEduProGenNombre: 'Nombre del Programa General'
+    }
+  }">
+  </mantenimiento-dinamico-component>

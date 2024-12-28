@@ -1,0 +1,516 @@
+<form [formGroup]="desplazamientoForm">
+  <!-- Título de la sección -->
+  <h2 class="text-lg font-medium mb-4">Registros de desplazamientos</h2>
+
+  <!-- Tabla de registros con scroll horizontal en móviles -->
+  <div class="overflow-x-auto">
+    <table mat-table [dataSource]="dataSource" class="w-full min-w-[900px]">
+      <!-- Columna N° -->
+      <ng-container matColumnDef="numero">
+          <th mat-header-cell *matHeaderCellDef> N° </th>
+          <td mat-cell *matCellDef="let i = index"> {{ i + 1 }} </td>
+      </ng-container>
+
+      <!-- Columna ACCIÓN -->
+      <ng-container matColumnDef="accion">
+          <th mat-header-cell *matHeaderCellDef> ACCIÓN </th>
+          <td mat-cell *matCellDef="let element"> {{ element.cDespNombre }} </td>
+      </ng-container>
+
+      <!-- Columna MOTIVO -->
+      <ng-container matColumnDef="motivo">
+          <th mat-header-cell *matHeaderCellDef> MOTIVO </th>
+          <td mat-cell *matCellDef="let element"> {{ element.Expr1 }} </td>
+      </ng-container>
+
+      <!-- Columna RÉGIMEN -->
+      <ng-container matColumnDef="regimen">
+          <th mat-header-cell *matHeaderCellDef> RÉGIMEN </th>
+          <td mat-cell *matCellDef="let element"> {{ element.cRegLabNombre }} </td>
+      </ng-container>
+
+      <!-- Columna F. INICIO -->
+      <ng-container matColumnDef="fechaInicio">
+          <th mat-header-cell *matHeaderCellDef> F. INICIO </th>
+          <td mat-cell *matCellDef="let element"> {{ element.dtFechaInicio | date:'dd/MM/yyyy' }} </td>
+      </ng-container>
+
+      <!-- Columna F. FIN -->
+      <ng-container matColumnDef="fechaFin">
+          <th mat-header-cell *matHeaderCellDef> F. FIN </th>
+          <td mat-cell *matCellDef="let element"> {{ element.dtFechaFin | date:'dd/MM/yyyy' }} </td>
+      </ng-container>
+
+      <!-- Columna Documento -->
+      <ng-container matColumnDef="documento">
+          <th mat-header-cell *matHeaderCellDef> DOCUMENTO </th>
+          <td mat-cell *matCellDef="let element"> {{ element.cDespNumeroDocumento }} </td>
+      </ng-container>
+
+      <!-- Columna Acciones con diseño responsivo -->
+      <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+          <td mat-cell *matCellDef="let element">
+              <div class="flex flex-row items-center justify-start gap-1 min-w-[120px]">
+                  <button mat-icon-button (click)="editarDesplazamiento(element)">
+                      <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="eliminarDesplazamiento(element)">
+                      <mat-icon>delete</mat-icon>
+                  </button>
+                  <button mat-icon-button (click)="verDesplazamiento(element)">
+                      <mat-icon>visibility</mat-icon>
+                  </button>
+              </div>
+          </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+  </div>
+
+  <!-- Agregar paginador -->
+  <mat-paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"
+      aria-label="Seleccionar página">
+  </mat-paginator>
+
+  <!-- Mejorar estructura de las cards con diseño responsivo -->
+  <div class="grid gap-4 mt-4">
+      <!-- Card de datos principales -->
+      <mat-card>
+          <mat-card-header>
+              <mat-card-title>Datos principales del documento</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-4">
+              <!-- Grid responsivo para campos principales -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <mat-form-field class="w-full">
+                      <mat-label>Tipo de documento</mat-label>
+                      <mat-select formControlName="iTipoDocId">
+                          <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+                              {{ tipo.cTipoDocNombre }}
+                          </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="desplazamientoForm.get('iTipoDocId')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-full">
+                      <mat-label>Número de documento</mat-label>
+                      <input matInput 
+                             formControlName="cDespNumeroDocumento" 
+                             uppercase>
+                      <mat-error *ngIf="desplazamientoForm.get('cDespNumeroDocumento')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-full">
+                      <mat-label>Fecha de documento</mat-label>
+                      <input matInput [matDatepicker]="picker" formControlName="dtDespFechaDocumento">
+                      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                      <mat-datepicker #picker></mat-datepicker>
+                      <mat-error *ngIf="desplazamientoForm.get('dtDespFechaDocumento')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+              </div>
+
+              <!-- Sección de archivo -->
+              <div class="w-full mt-4">
+                  <app-archivo-handler
+                      [archivoId]="archivoId"
+                      (archivo)="onArchivoSelected($event)"
+                      (iArchId)="onArchivoIdSelected($event)"
+                      [required]="true"
+                      containerClass="w-full">
+                  </app-archivo-handler>
+                  <mat-error *ngIf="desplazamientoForm.get('iArchId')?.touched && desplazamientoForm.get('iArchId')?.hasError('required')" 
+                             class="text-sm mt-1">
+                      Debe seleccionar un archivo
+                  </mat-error>
+              </div>
+
+              <!-- Grid responsivo para campos adicionales -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                  <mat-form-field class="w-full">
+                      <mat-label>Régimen laboral</mat-label>
+                      <mat-select formControlName="iRegLabId" (selectionChange)="onRegimenChange($event.value)">
+                          <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+                              {{ regimen.cRegLabNombre }}
+                          </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="desplazamientoForm.get('iRegLabId')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-full">
+                      <mat-label>Acción</mat-label>
+                      <mat-select formControlName="iDespAccId" [disabled]="!regimenSeleccionado" 
+                                 (selectionChange)="onAccionChange($event.value)">
+                          <mat-option *ngFor="let accion of accionesFiltradas" [value]="accion.iDespAccId">
+                              {{ accion.cDespNombre }}
+                          </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="desplazamientoForm.get('iDespAccId')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-full">
+                      <mat-label>Motivo de acción</mat-label>
+                      <mat-select formControlName="iDespMotId" [disabled]="!accionSeleccionada">
+                          <mat-option *ngFor="let motivo of motivosFiltrados" [value]="motivo.iDespMotAccId">
+                              {{ motivo.cDespNombre }}
+                          </mat-option>
+                      </mat-select>
+                      <mat-error *ngIf="desplazamientoForm.get('iDespMotId')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+              </div>
+          </mat-card-content>
+      </mat-card>
+
+      <!-- Card de detalle -->
+      <mat-card class="mt-4">
+          <mat-card-header>
+              <mat-card-title>Detalle del documento</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="p-4">
+              <!-- Grid responsivo para fechas -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <mat-form-field class="w-full">
+                      <mat-label>Fecha de inicio</mat-label>
+                      <input matInput [matDatepicker]="pickerInicio" formControlName="dtFechaInicio">
+                      <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerInicio></mat-datepicker>
+                      <mat-error *ngIf="desplazamientoForm.get('dtFechaInicio')?.hasError('required')">
+                          Este campo es requerido
+                      </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field class="w-full">
+                      <mat-label>Fecha fin</mat-label>
+                      <input matInput 
+                             [matDatepicker]="pickerFin" 
+                             formControlName="dtFechaFin"
+                             placeholder="DD/MM/AAAA">
+                      <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerFin></mat-datepicker>
+                  </mat-form-field>
+              </div>
+          </mat-card-content>
+      </mat-card>
+  </div>
+
+  <!-- Sección origen/destino con diseño responsivo -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+      <!-- Datos de origen -->
+      <div class="p-4 bg-white rounded-lg">
+          <h3 class="text-lg font-semibold mb-4">Datos de origen</h3>
+
+          <!-- Campo código modular -->
+          <mat-form-field class="w-full">
+              <mat-label>Código modular</mat-label>
+              <input matInput 
+                     data-origen-codigo-modular
+                     [formControl]="codigoModularOrigenControl"
+                     required>
+              <button mat-icon-button matSuffix (click)="buscarCentroLaboralOrigen()">
+                  <mat-icon>search</mat-icon>
+              </button>
+              <mat-error *ngIf="codigoModularOrigenControl.touched && codigoModularOrigenControl.hasError('required')">
+                  Este campo es requerido
+              </mat-error>
+          </mat-form-field>
+
+          <!-- Información del centro laboral -->
+          <div class="mt-4 space-y-2">
+              <p><strong>Centro laboral:</strong> <span data-origen-centro-laboral></span></p>
+              <p><strong>Región:</strong> <span data-origen-region></span></p>
+              <p><strong>Instancia de gestión educativa descentralizada:</strong> <span data-origen-instancia></span></p>
+              <p><strong>Modalidad educativa:</strong> <span data-origen-modalidad></span></p>
+              <p><strong>Nivel educativo:</strong> <span data-origen-nivel></span></p>
+          </div>
+
+          <!-- Grid responsivo para campos adicionales -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <mat-form-field class="w-full">
+                  <mat-label>Condición Laboral</mat-label>
+                  <mat-select formControlName="iCondLabIdOrigen" (selectionChange)="onCondicionLaboralChange($event.value)">
+                      <mat-option *ngFor="let condicion of condicionesLaborales" [value]="condicion.iCondLabId">
+                          {{ condicion.cCondLabNombre }}
+                      </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="desplazamientoForm.get('iCondLabIdOrigen')?.hasError('required')">
+                      Este campo es requerido
+                  </mat-error>
+              </mat-form-field>
+
+              <mat-form-field class="w-full">
+                  <mat-label>Situación Laboral</mat-label>
+                  <mat-select formControlName="iSitLabIdOrigen" [disabled]="situacionesLaboralesFiltradas.length === 0">
+                      <mat-option *ngFor="let situacion of situacionesLaboralesFiltradas" [value]="situacion.iSitLabId">
+                          {{ situacion.cSitLabNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="w-full" *ngIf="mostrarGrupoOcupacional">
+                  <mat-label>Grupo Ocupacional</mat-label>
+                  <mat-select formControlName="iGrupOcupIdOrigen"
+                              (selectionChange)="onGrupoOcupacionalOrigenChange($event.value)">
+                      <mat-option *ngFor="let grupo of gruposOcupacionales" [value]="grupo.iGrupOcupId">
+                          {{ grupo.cGrupOcupNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="w-full" *ngIf="mostrarGrupoOcupacional">
+                  <mat-label>Categoría Remunerativa</mat-label>
+                  <mat-select formControlName="iCatRemuIdOrigen" 
+                              [disabled]="!grupoOcupacionalOrigenSeleccionado">
+                      <mat-option *ngFor="let categoria of categoriasFiltradasOrigen" 
+                                  [value]="categoria.iCatRemuId">
+                          {{ categoria.cCatRemuNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+          </div>
+
+          <mat-form-field class="w-full mt-4">
+              <mat-label>Código de plaza</mat-label>
+              <input matInput 
+                     formControlName="cDespCodigoPlazaOrigen"
+                     uppercase>
+              <mat-error *ngIf="desplazamientoForm.get('cDespCodigoPlazaOrigen')?.hasError('required')">
+                  Este campo es requerido
+              </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>USE / Zona / Subregión</mat-label>
+              <input matInput 
+                     formControlName="cDespLabUseZonaSubRegionOrigen"
+                     uppercase>
+          </mat-form-field>
+
+          <mat-form-field class="w-full" *ngIf="mostrarEscala">
+              <mat-label>Escala / Categoría / Nivel /Grupo</mat-label>
+              <mat-select formControlName="iEscCatIdOrigen">
+                  <mat-option *ngFor="let escala of escalaCategoriasFiltradas" [value]="escala.iEscCatId">
+                      {{ escala.cEscCatNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="iCargLabIdOrigen">
+                  <mat-option *ngFor="let cargo of cargosLaborales" [value]="cargo.iCargLabId">
+                      {{ cargo.cCargLabNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>Jornada Laboral</mat-label>
+              <mat-select formControlName="iJorLabIdOrigen">
+                  <mat-option *ngFor="let jornada of jornadasLaborales" [value]="jornada.iJorLabId">
+                      {{ jornada.cJorLabNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+      </div>
+
+      <!-- Datos de destino -->
+      <div class="p-4 bg-white rounded-lg">
+          <h3 class="text-lg font-semibold mb-4">Datos de destino</h3>
+
+          <!-- Campo código modular -->
+          <mat-form-field class="w-full">
+              <mat-label>Código modular</mat-label>
+              <input matInput 
+                     data-destino-codigo-modular
+                     [formControl]="codigoModularDestinoControl"
+                     required>
+              <button mat-icon-button matSuffix (click)="buscarCentroLaboralDestino()">
+                  <mat-icon>search</mat-icon>
+              </button>
+              <mat-error *ngIf="codigoModularDestinoControl.touched && codigoModularDestinoControl.hasError('required')">
+                  Este campo es requerido
+              </mat-error>
+          </mat-form-field>
+
+          <!-- Información del centro laboral -->
+          <div class="mt-4 space-y-2">
+              <p><strong>Centro laboral:</strong> <span data-destino-centro-laboral></span></p>
+              <p><strong>Región:</strong> <span data-destino-region></span></p>
+              <p><strong>Instancia de gestión educativa descentralizada:</strong> <span data-destino-instancia></span></p>
+              <p><strong>Modalidad educativa:</strong> <span data-destino-modalidad></span></p>
+              <p><strong>Nivel educativo:</strong> <span data-destino-nivel></span></p>
+          </div>
+
+          <!-- Grid responsivo para campos adicionales -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+              <mat-form-field class="w-full">
+                  <mat-label>Condición Laboral</mat-label>
+                  <mat-select formControlName="iCondLabIdDestino" (selectionChange)="onCondicionLaboralChange($event.value)">
+                      <mat-option *ngFor="let condicion of condicionesLaborales" [value]="condicion.iCondLabId">
+                          {{ condicion.cCondLabNombre }}
+                      </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="desplazamientoForm.get('iCondLabIdDestino')?.hasError('required')">
+                      Este campo es requerido
+                  </mat-error>
+              </mat-form-field>
+
+              <mat-form-field class="w-full">
+                  <mat-label>Situación Laboral</mat-label>
+                  <mat-select formControlName="iSitLabIdDestino" 
+                              [disabled]="situacionesLaboralesFiltradas.length === 0">
+                      <mat-option *ngFor="let situacion of situacionesLaboralesFiltradas" [value]="situacion.iSitLabId">
+                          {{ situacion.cSitLabNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="w-full" *ngIf="mostrarGrupoOcupacional">
+                  <mat-label>Grupo Ocupacional</mat-label>
+                  <mat-select formControlName="iGrupOcupIdDestino"
+                              (selectionChange)="onGrupoOcupacionalDestinoChange($event.value)">
+                      <mat-option *ngFor="let grupo of gruposOcupacionales" [value]="grupo.iGrupOcupId">
+                          {{ grupo.cGrupOcupNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+
+              <mat-form-field class="w-full" *ngIf="mostrarGrupoOcupacional">
+                  <mat-label>Categoría Remunerativa</mat-label>
+                  <mat-select formControlName="iCatRemuIdDestino" 
+                              [disabled]="!grupoOcupacionalDestinoSeleccionado">
+                      <mat-option *ngFor="let categoria of categoriasFiltradasDestino" 
+                                  [value]="categoria.iCatRemuId">
+                          {{ categoria.cCatRemuNombre }}
+                      </mat-option>
+                  </mat-select>
+              </mat-form-field>
+          </div>
+
+          <mat-form-field class="w-full mt-4">
+              <mat-label>Código de plaza</mat-label>
+              <input matInput 
+                     formControlName="cDespCodigoPlazaDestino"
+                     uppercase>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>USE / Zona / Subregión</mat-label>
+              <input matInput 
+                     formControlName="cDespLabUseZonaSubRegionDestino"
+                     uppercase>
+          </mat-form-field>
+
+          <mat-form-field class="w-full" *ngIf="mostrarEscala">
+              <mat-label>Escala / Categoría / Nivel /Grupo</mat-label>
+              <mat-select formControlName="iEscCatIdDestino">
+                  <mat-option *ngFor="let escala of escalaCategoriasFiltradas" [value]="escala.iEscCatId">
+                      {{ escala.cEscCatNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="iCargLabIdDestino">
+                  <mat-option *ngFor="let cargo of cargosLaborales" [value]="cargo.iCargLabId">
+                      {{ cargo.cCargLabNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+              <mat-label>Jornada Laboral</mat-label>
+              <mat-select formControlName="iJorLabIdDestino">
+                  <mat-option *ngFor="let jornada of jornadasLaborales" [value]="jornada.iJorLabId">
+                      {{ jornada.cJorLabNombre }}
+                  </mat-option>
+              </mat-select>
+          </mat-form-field>
+      </div>
+  </div>
+
+  <!-- Sección final -->
+  <div class="mt-4 p-4 bg-white rounded-lg">
+      <!-- Toggle mandato judicial -->
+      <div class="mb-4 flex items-center gap-2">
+          <label>¿Por mandato judicial?</label>
+          <mat-slide-toggle formControlName="bDespMandadoJudicial">
+          </mat-slide-toggle>
+      </div>
+
+      <!-- Campo de anotaciones -->
+      <mat-form-field class="w-full">
+          <mat-label>Anotaciones</mat-label>
+          <textarea matInput 
+                    formControlName="cDespAnotaciones"
+                    rows="4"
+                    uppercase></textarea>
+      </mat-form-field>
+
+      <!-- Botones con diseño responsivo -->
+      <div class="flex flex-col sm:flex-row justify-between gap-4 mt-4">
+          <!-- Cuando estamos en modo visualización, mostrar solo el botón Cerrar -->
+          <ng-container *ngIf="desplazamientoForm.disabled; else botonesEdicion">
+              <div class="flex justify-end w-full">
+                  <button mat-stroked-button 
+                          color="basic" 
+                          class="flex items-center gap-2 w-full sm:w-auto justify-center"
+                          (click)="cerrarVisualizacion()">
+                      <mat-icon>close</mat-icon>
+                      <span>CERRAR</span>
+                  </button>
+              </div>
+          </ng-container>
+
+          <!-- Template para los botones en modo edición -->
+          <ng-template #botonesEdicion>
+              <!-- Botón Retornar -->
+              <button mat-stroked-button 
+                      color="basic" 
+                      class="flex items-center gap-2 w-full sm:w-auto justify-center"
+                      (click)="retornar()">
+                  <mat-icon>arrow_back</mat-icon>
+                  <span>RETORNAR</span>
+              </button>
+
+              <!-- Contenedor botones derecha -->
+              <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <!-- Botón Limpiar -->
+                  <button mat-stroked-button 
+                          color="basic" 
+                          class="flex items-center gap-2 justify-center"
+                          (click)="limpiarFormulario()">
+                      <mat-icon>cleaning_services</mat-icon>
+                      <span>LIMPIAR</span>
+                  </button>
+
+                  <!-- Botón Guardar/Actualizar -->
+                  <button type="button" 
+                          mat-raised-button 
+                          color="primary" 
+                          class="flex items-center gap-2 justify-center"
+                          (click)="guardarDesplazamiento()">
+                      <mat-icon>{{ modoEdicion ? 'update' : 'save' }}</mat-icon>
+                      <span>{{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}</span>
+                  </button>
+              </div>
+          </ng-template>
+      </div>
+  </div>
+
+</form> 

@@ -1,0 +1,26 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Instancias de Gestión Educativa Descentralizadas',
+    vista: {
+      nombre: 'esc.V_MantenimientoInstanciasGestionEducativaDescentralizadas',
+      columnas: [
+        { campo: 'iInstGeEduId', label: 'ID', orden: 1 },
+        { campo: 'cInstGeEduNombre', label: 'Nombre', orden: 2 },
+        { campo: 'cDirRegNombre', label: 'Dirección Regional', orden: 3}
+      ]
+    },
+    tabla: 'esc.instancias_gestion_educativa_descentralizadas',
+  dependencias: [
+      {
+        campo: 'iDirRegId',
+        tabla: 'esc.direcciones_regionales',
+        campoClave: 'iDirRegId',
+        campoMostrar: 'cDirRegNombre'
+      }
+    ],
+    labels: {
+      iInstGeEduId: 'ID',
+      iDirRegId: 'Dirección Regional',
+      cInstGeEduNombre: 'Nombre de la Instancia'
+    }
+  }">
+  </mantenimiento-dinamico-component>

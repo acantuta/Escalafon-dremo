@@ -1,0 +1,25 @@
+<div class="file-upload-container d-flex flex-row">
+    <div>
+        <label for="documento" class="form-label">
+          Documento <span *ngIf="isFileRequired">*</span>
+        </label>
+        <input
+          type="file"
+          id="documento"
+          (change)="onFileSelected($event)"
+          class="form-control"
+          [required]="isFileRequired"
+        />
+    </div>
+    <div class="mt-4">
+        <input
+          type="number"
+          [(ngModel)]="selectedFolio"
+          name="folios"
+          id="folios"
+          class="form-control"
+          placeholder="Folios"
+          [required]="isFolioRequired"
+        />
+    </div>
+</div>  

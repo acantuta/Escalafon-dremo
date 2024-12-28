@@ -1,0 +1,35 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Motivos de Acciones de Compensación',
+    vista: {
+      nombre: 'esc.V_MantenimientoCompensacionesMotivosAcciones',
+      columnas: [
+        {
+          campo: 'iCompMotAccId',
+          label: 'ID',
+          orden: 1
+        },
+        {
+          campo: 'cCompAccNombre',
+          label: 'Acción de Compensación',
+          orden: 2
+        },
+        {
+          campo: 'cCompMotAccNombre',
+          label: 'Nombre del Motivo',
+          orden: 3
+        }
+      ]
+    },
+    tabla: 'esc.compensaciones_motivos_acciones',
+    dependencias: [
+      {
+        campo: 'iCompAccId',
+        tabla: 'esc.compensaciones_acciones',
+        campoClave: 'iCompAccId',
+        campoMostrar: 'cCompAccNombre'
+      }
+    ],
+    labels: {
+      'iCompAccId': 'Acción de Compensación'
+    }
+  }"></mantenimiento-dinamico-component>

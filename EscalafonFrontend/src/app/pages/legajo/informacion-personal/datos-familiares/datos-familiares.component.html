@@ -1,0 +1,283 @@
+<div class="p-4">
+    <!-- Tabla de registros de familiares -->
+    <table mat-table [dataSource]="dataSource" class="w-full mb-4">
+        <!-- Columna N° -->
+        <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef> N° </th>
+            <td mat-cell *matCellDef="let familiar; let i = index"> 
+                {{ i + 1 + paginator.pageIndex * paginator.pageSize }}
+            </td>
+        </ng-container>
+
+        <!-- Columna Apellidos y nombres -->
+        <ng-container matColumnDef="apellidosNombres">
+            <th mat-header-cell *matHeaderCellDef> APELLIDOS Y NOMBRES </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{familiar.cInfoPeFamFamiPrimerApellido}} {{familiar.cInfoPeFamFamiSegundoApellido}} {{familiar.cInfoPeFamFamiNombres}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Tipo documento -->
+        <ng-container matColumnDef="tipoDocumento">
+            <th mat-header-cell *matHeaderCellDef> TIPO DOCUMENTO </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{familiar.cTipoIdentNombre}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Nro documento -->
+        <ng-container matColumnDef="nroDocumento">
+            <th mat-header-cell *matHeaderCellDef> NRO DOCUMENTO </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{familiar.cInfoPeFamFamiNumeroDocumento}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Sexo -->
+        <ng-container matColumnDef="sexo">
+            <th mat-header-cell *matHeaderCellDef> SEXO </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{familiar.cInfoPeFamFamiSexo === 'M' ? 'Masculino' : 'Femenino'}}
+            </td>
+        </ng-container>
+
+        <!-- Columna F. Nacimiento -->
+        <ng-container matColumnDef="fechaNacimiento">
+            <th mat-header-cell *matHeaderCellDef> F. NACIMIENTO </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{ familiar.dInfoPeFamFamiFechaNacimiento | date: 'dd/MM/yyyy' }}
+            </td>
+        </ng-container>
+
+        <!-- Columna Parentesco -->
+        <ng-container matColumnDef="parentesco">
+            <th mat-header-cell *matHeaderCellDef> PARENTESCO </th>
+            <td mat-cell *matCellDef="let familiar">
+                {{familiar.cInfoPeFamParentNombre}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Derechohabiente -->
+        <ng-container matColumnDef="derechohabiente">
+            <th mat-header-cell *matHeaderCellDef> DERECHOHABIENTE </th>
+            <td mat-cell *matCellDef="let familiar">
+                {{convertirABoolean(familiar.bInfoPeFamFamiEsDerechohabiente) ? 'Sí' : 'No'}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Situación -->
+        <ng-container matColumnDef="situacion">
+            <th mat-header-cell *matHeaderCellDef> SITUACIÓN </th>
+            <td mat-cell *matCellDef="let familiar"> 
+                {{convertirABoolean(familiar.bInfoPeFamFamiEsFallecido) ? 'FALLECIDO' : 'VIVO'}}
+            </td>
+        </ng-container>
+
+        <!-- Columna Estado -->
+        <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef> ESTADO </th>
+            <td mat-cell *matCellDef> Regular text column </td>
+        </ng-container>
+
+        <!-- Columna Acciones -->
+        <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+            <td mat-cell *matCellDef="let familiar">
+                <div class="flex gap-1">
+                    <button mat-icon-button 
+                            (click)="editarFamiliar(familiar)" 
+                            matTooltip="Editar">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button 
+                            (click)="eliminarFamiliar(familiar.iInfoPeFamFamiId!)" 
+                            matTooltip="Eliminar">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                    <button mat-icon-button 
+                            (click)="visualizarFamiliar(familiar)" 
+                            matTooltip="Visualizar">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                </div>
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- Paginación -->
+    <mat-paginator 
+        [pageSizeOptions]="[5, 10, 25]"
+        [pageSize]="10"
+        showFirstLastButtons
+        aria-label="Seleccionar página">
+    </mat-paginator>
+
+    <!-- Formulario de datos personales del familiar -->
+    <div class="border rounded-lg p-4">
+        <h2 class="text-xl font-medium mb-4">Datos personales del familiar</h2>
+
+        <form [formGroup]="familiarForm" (ngSubmit)="guardarFamiliar()">
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Tipo documento</mat-label>
+                    <mat-select formControlName="iTipoIdentId">
+                        <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocIdenId">
+                            {{tipo.cTipoDocIdenNombre}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="(familiarForm.get('iTipoIdentId')?.touched || submitted) && familiarForm.get('iTipoIdentId')?.invalid">
+                        Campo requerido
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Número de documento</mat-label>
+                    <input matInput formControlName="cInfoPeFamFamiNumeroDocumento" uppercase>
+                    <mat-error *ngIf="(familiarForm.get('cInfoPeFamFamiNumeroDocumento')?.touched || submitted) && familiarForm.get('cInfoPeFamFamiNumeroDocumento')?.invalid">
+                        Campo requerido
+                    </mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Primer Apellido</mat-label>
+                    <input matInput formControlName="cInfoPeFamFamiPrimerApellido" uppercase>
+                    <mat-error *ngIf="(familiarForm.get('cInfoPeFamFamiPrimerApellido')?.touched || submitted) && familiarForm.get('cInfoPeFamFamiPrimerApellido')?.invalid">
+                        Campo requerido
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Segundo Apellido</mat-label>
+                    <input matInput formControlName="cInfoPeFamFamiSegundoApellido" uppercase>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Nombres</mat-label>
+                    <input matInput formControlName="cInfoPeFamFamiNombres" uppercase>
+                </mat-form-field>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-4">
+                <mat-form-field class="w-full">
+                    <mat-label>Fecha de nacimiento</mat-label>
+                    <input matInput [matDatepicker]="nacimientoFamiliarPicker" 
+                           formControlName="dInfoPeFamFamiFechaNacimiento">
+                    <mat-datepicker-toggle matSuffix [for]="nacimientoFamiliarPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #nacimientoFamiliarPicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field class="w-full">
+                    <mat-label>Sexo</mat-label>
+                    <mat-select formControlName="cInfoPeFamFamiSexo">
+                        <mat-option value="M">MASCULINO</mat-option>
+                        <mat-option value="F">FEMENINO</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <mat-slide-toggle [checked]="calcularEsMayorEdad(familiarForm.get('dInfoPeFamFamiFechaNacimiento')?.value)" 
+                                 [disabled]="true">
+                    ¿Es mayor de edad?
+                </mat-slide-toggle>
+            </div>
+
+            <!-- Sección Fallecido -->
+            <div class="border rounded p-4 mb-4">
+                <h2 class="text-xl font-medium mb-4">Fallecido</h2>
+                <mat-slide-toggle class="mb-2" 
+                                  formControlName="bInfoPeFamFamiEsFallecido"
+                                  >
+                    ¿Es fallecido?
+                </mat-slide-toggle>
+            </div>
+
+            <!-- Sección Datos de vínculo -->
+            <div class="border rounded p-4 mb-4">
+                <h2 class="text-xl font-medium mb-4">Datos de vínculo con el titular</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <mat-form-field class="w-full">
+                        <mat-label>Parentesco</mat-label>
+                        <mat-select formControlName="iInfoPeFamParentId">
+                            <mat-option *ngFor="let parentesco of parentescos" [value]="parentesco.iInfoPeFamParentId">
+                                {{parentesco.cInfoPeFamParentNombre}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-slide-toggle formControlName="bInfoPeFamFamiEsDerechohabiente"
+                                    color="primary"
+                                    class="mt-4">
+                        ¿Es derechohabiente?
+                    </mat-slide-toggle>
+                </div>
+            </div>
+
+            <!-- Sección Datos del acta -->
+            <div class="border rounded p-4 mb-4">
+                <h2 class="text-xl font-medium mb-4">Datos del acta o partida nacimiento</h2>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <mat-form-field class="w-full">
+                        <mat-label>Número de acta o partida de nacimiento</mat-label>
+                        <input matInput formControlName="cInfoPeFamFamiNumeroActaNacimiento" uppercase>
+                    </mat-form-field>
+
+                    <mat-form-field class="w-full">
+                        <mat-label>Fecha de emisión</mat-label>
+                        <input matInput [matDatepicker]="emisionActaPicker" 
+                               formControlName="dInfoPeFamFamiFechaEmision">
+                        <mat-datepicker-toggle matSuffix [for]="emisionActaPicker"></mat-datepicker-toggle>
+                        <mat-datepicker #emisionActaPicker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <app-archivo-handler
+                    [archivoId]="familiarForm.get('iArchId')?.value"
+                    (archivoSeleccionado)="onArchivoSeleccionado($event)"
+                    [required]="false"
+                    [allowedExtensions]="['.pdf']"
+                    [maxFileSize]="2"
+                    containerClass="w-full">
+                </app-archivo-handler>
+            </div>
+
+            <!-- Sección Discapacidad -->
+            <div class="border rounded p-4 mb-4">
+                <h2 class="text-xl font-medium mb-4">Datos de discapacidad</h2>
+                <mat-slide-toggle formControlName="bInfoPeFamFamiEsDiscapacitado">
+                    ¿Es discapacitado?
+                </mat-slide-toggle>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex justify-between mt-6">
+                <button mat-stroked-button type="button" routerLink="/principal/inicio">
+                    <mat-icon>arrow_back</mat-icon>
+                    RETORNAR
+                </button>
+                <div class="flex gap-2">
+                    <button mat-stroked-button 
+                            type="button" 
+                            (click)="limpiarFormulario()"
+                            *ngIf="modoFormulario !== 'ver'">
+                        LIMPIAR
+                    </button>
+                    <button mat-raised-button 
+                            color="primary" 
+                            type="submit"
+                            *ngIf="modoFormulario !== 'ver'">
+                        GUARDAR
+                    </button>
+                    <button mat-stroked-button 
+                            type="button" 
+                            (click)="limpiarFormulario()"
+                            *ngIf="modoFormulario === 'ver'">
+                        CERRAR
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div> 

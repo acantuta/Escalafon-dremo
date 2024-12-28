@@ -1,0 +1,42 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: 7) Evaluación de Desempeño / Acciones de Ascenso',
+  vista: {
+    nombre: 'esc.V_MantenimientoAscensosAcciones',
+    columnas: [
+      {
+        campo: 'iAscAccId',
+        label: 'ID',
+        orden: 1
+      },
+      {
+        campo: 'cRegLabNombre',
+        label: 'Régimen Laboral',
+        orden: 2
+      },
+      {
+        campo: 'cAscAccNombre',
+        label: 'Nombre',
+        orden: 3
+      },
+      {
+        campo: 'cAscAccDescripcion',
+        label: 'Descripción',
+        orden: 4
+      }
+    ]
+  },
+  tabla: 'esc.ascensos_acciones',
+  labels: {
+    'cAscAccNombre': 'Nombre de la Acción',
+    'cAscAccDescripcion': 'Descripción',
+    'iRegLabId': 'Régimen Laboral'
+  },
+  dependencias: [
+    {
+      campo: 'iRegLabId',
+      tabla: 'esc.regimenes_laborales',
+      campoClave: 'iRegLabId',
+      campoMostrar: 'cRegLabNombre'
+    }
+  ]
+}"></mantenimiento-dinamico-component> 

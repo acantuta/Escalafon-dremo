@@ -1,0 +1,149 @@
+<!-- Reemplazamos la cabecera con el componente servidor-publico -->
+<app-servidor-publico></app-servidor-publico>
+
+<!-- Contenido principal -->
+<div class="bg-white rounded-lg shadow p-4 mt-4 overflow-hidden">
+  <!-- Tab bar -->
+  <mat-tab-group class="h-full">
+    <mat-tab label="Relaciones laborales individuales y colectivas">
+      <div class="py-4">
+        <h4 class="text-lg font-medium mb-4">Registro de relaciones</h4>
+    
+        <!-- Tabla de registros con scroll horizontal en móviles -->
+        <div class="overflow-x-auto">
+          <table mat-table [dataSource]="registros" class="w-full min-w-[800px]">
+            <!-- Columna N° -->
+            <ng-container matColumnDef="numero">
+              <th mat-header-cell *matHeaderCellDef> N° </th>
+              <td mat-cell *matCellDef="let registro"> {{registro.numero}} </td>
+            </ng-container>
+    
+            <!-- Columna Tipo de documento -->
+            <ng-container matColumnDef="tipoDocumento">
+              <th mat-header-cell *matHeaderCellDef> Tipo de documento </th>
+              <td mat-cell *matCellDef="let registro"> {{registro.tipoDocumento}} </td>
+            </ng-container>
+    
+            <!-- Columna F. Emisión -->
+            <ng-container matColumnDef="fechaEmision">
+              <th mat-header-cell *matHeaderCellDef> F. Emisión </th>
+              <td mat-cell *matCellDef="let registro"> {{registro.fechaEmision}} </td>
+            </ng-container>
+    
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="acciones">
+              <th mat-header-cell *matHeaderCellDef> Acciones </th>
+              <td mat-cell *matCellDef="let registro" class="!w-[120px]">
+                <div class="flex flex-row items-center justify-start gap-1 min-w-[120px]">
+                  <mat-icon class="cursor-pointer" (click)="editarRegistro(registro)">edit</mat-icon>
+                  <mat-icon class="cursor-pointer" (click)="eliminarRegistro(registro)">delete</mat-icon>
+                  <mat-icon class="cursor-pointer" (click)="verRegistro(registro)">visibility</mat-icon>
+                </div>
+              </td>
+            </ng-container>
+    
+            <tr mat-header-row *matHeaderRowDef="['numero', 'tipoDocumento', 'fechaEmision', 'acciones']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['numero', 'tipoDocumento', 'fechaEmision', 'acciones']"></tr>
+          </table>
+        </div>
+    
+        <!-- Paginador -->
+        <mat-paginator class="mt-4"></mat-paginator>
+    
+        <!-- Formulario de carga con diseño responsivo -->
+        <div class="mt-8 p-4 border border-gray-200 rounded-lg">
+          <h2 class="text-gray-700 font-medium mb-4">
+            {{ modoVisualizacion ? 'Visualización de archivo' : 
+                modoEdicion ? 'Edición de archivo' : 
+                'Carga de archivo' }}
+          </h2>
+          
+          <form [formGroup]="relacionForm">
+            <!-- Grid responsivo para campos principales -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <mat-form-field>
+                <mat-label>Tipo de documento</mat-label>
+                <mat-select formControlName="iTipoDocId" required>
+                  <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+                    {{ tipo.cTipoDocNombre }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="relacionForm.get('iTipoDocId')?.touched && relacionForm.get('iTipoDocId')?.hasError('required')">
+                  El tipo de documento es requerido
+                </mat-error>
+              </mat-form-field>
+    
+              <mat-form-field>
+                <mat-label>Fecha de emisión</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="dtRelaIndColecFechaEmision" required>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="relacionForm.get('dtRelaIndColecFechaEmision')?.touched && relacionForm.get('dtRelaIndColecFechaEmision')?.hasError('required')">
+                  La fecha de emisión es requerida
+                </mat-error>
+              </mat-form-field>
+            </div>
+    
+            <!-- Sección de archivo -->
+            <div class="mb-4">
+              <app-archivo-handler
+                [archivoId]="archivoId"
+                (archivoSeleccionado)="onArchivoSeleccionado($event)"
+                [maxFileSize]="2"
+                [allowedExtensions]="['.pdf']"
+                [required]="true"
+                containerClass="w-full"
+              ></app-archivo-handler>
+              <mat-error *ngIf="!archivoId && formSubmitted" class="mt-1">
+                El archivo es requerido
+              </mat-error>
+            </div>
+    
+            <!-- Campo de anotaciones a ancho completo -->
+            <mat-form-field class="w-full">
+              <mat-label>Anotaciones</mat-label>
+              <textarea matInput rows="4" formControlName="cRelaIndColecAnotaciones" uppercase></textarea>
+            </mat-form-field>
+          </form>
+        </div>
+    
+        <!-- Botones de acción con diseño responsivo -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 mt-8">
+          <button mat-stroked-button color="primary" 
+                  class="w-full sm:w-auto flex items-center justify-center gap-2"
+                  routerLink="/principal/inicio">
+            <mat-icon>arrow_back</mat-icon>
+            RETORNAR
+          </button>
+          <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <button 
+              mat-stroked-button 
+              class="flex items-center justify-center gap-2"
+              (click)="limpiarFormulario()"
+              *ngIf="!modoVisualizacion">
+              <mat-icon>cleaning_services</mat-icon>
+              LIMPIAR
+            </button>
+            <button 
+              mat-stroked-button 
+              class="flex items-center justify-center gap-2"
+              (click)="cerrarVisualizacion()"
+              *ngIf="modoVisualizacion">
+              <mat-icon>close</mat-icon>
+              CERRAR
+            </button>
+            <button 
+              mat-raised-button 
+              color="primary" 
+              class="flex items-center justify-center gap-2"
+              (click)="guardar()" 
+              *ngIf="!modoVisualizacion">
+              <mat-icon>save</mat-icon>
+              {{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

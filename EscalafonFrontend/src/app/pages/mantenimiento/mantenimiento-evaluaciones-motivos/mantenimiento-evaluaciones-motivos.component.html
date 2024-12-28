@@ -1,0 +1,27 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Evaluaciones Desempeños Motivos Acciones',
+    vista: {
+      nombre: 'esc.V_MantenimientoEvaluacionesDesempeniosMotivosAcciones',
+      columnas: [
+        { campo: 'iEvalDescAccMotId', label: 'ID', orden: 1 },
+        { campo: 'cEvalDesAccNombre', label: 'Acción', orden: 2 },
+        { campo: 'cEvalDescAccMotNombre', label: 'Nombre del Motivo', orden: 3 },
+        {  campo: 'cRegLabNombre', label: 'Régimen laboral', orden: 4 }
+      ]
+    },
+    tabla: 'esc.evaluaciones_desempenios_motivos_acciones',
+    dependencias: [
+      {
+        campo: 'iEvalDesAccId',
+        tabla: 'esc.evaluaciones_desempenios_acciones',
+        campoClave: 'iEvalDesAccId',
+        campoMostrar: 'cEvalDesAccNombre'
+      }
+    ],
+    labels: {
+      iEvalDescAccMotId: 'ID',
+      iEvalDesAccId: 'Acción',
+      cEvalDescAccMotNombre: 'Nombre del Motivo'
+    }
+  }">
+  </mantenimiento-dinamico-component>

@@ -1,0 +1,257 @@
+<!-- Título de la sección -->
+<h2 class="text-lg font-medium mb-4">Registros de ascensos</h2>
+
+<!-- Tabla de registros de ascensos -->
+<table mat-table [dataSource]="dataSource" class="w-full">
+    <!-- Columna N° -->
+    <ng-container matColumnDef="numero">
+        <th mat-header-cell *matHeaderCellDef> N° </th>
+        <td mat-cell *matCellDef="let ascenso; let i = index"> 
+          {{ i + 1 }} 
+        </td>
+    </ng-container>
+
+    <!-- Columna ACCIÓN -->
+    <ng-container matColumnDef="accion">
+        <th mat-header-cell *matHeaderCellDef> ACCIÓN </th>
+        <td mat-cell *matCellDef="let ascenso"> {{ ascenso.cAscAccNombre }} </td>
+    </ng-container>
+
+    <!-- Columna MOTIVO -->
+    <ng-container matColumnDef="motivo">
+        <th mat-header-cell *matHeaderCellDef> MOTIVO </th>
+        <td mat-cell *matCellDef="let ascenso"> {{ ascenso.cAscMotNombre }} </td>
+    </ng-container>
+
+    <!-- Columna RÉGIMEN -->
+    <ng-container matColumnDef="regimen">
+        <th mat-header-cell *matHeaderCellDef> RÉGIMEN </th>
+        <td mat-cell *matCellDef="let ascenso"> {{ ascenso.cRegLabNombre }} </td>
+    </ng-container>
+
+    <!-- Columna F. INICIO -->
+    <ng-container matColumnDef="fechaInicio">
+        <th mat-header-cell *matHeaderCellDef> F. INICIO </th>
+        <td mat-cell *matCellDef="let ascenso"> 
+          {{ ascenso.dtAscFechaInicio | date:'dd/MM/yyyy' }} 
+        </td>
+    </ng-container>
+
+    <!-- Columna Documento -->
+    <ng-container matColumnDef="documento">
+        <th mat-header-cell *matHeaderCellDef> DOCUMENTO </th>
+        <td mat-cell *matCellDef="let ascenso"> {{ ascenso.cAscNumeroDocumento }} </td>
+    </ng-container>
+
+    <!-- Columna F. DOCUMENTO -->
+    <ng-container matColumnDef="fechaDocumento">
+        <th mat-header-cell *matHeaderCellDef> F. DOCUMENTO </th>
+        <td mat-cell *matCellDef="let ascenso"> 
+          {{ ascenso.dtAscFechaDocumento | date:'dd/MM/yyyy' }} 
+        </td>
+    </ng-container>
+
+    <!-- Columna Acciones -->
+    <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef> ACCIONES </th>
+        <td mat-cell *matCellDef="let ascenso">
+            <div class="flex gap-1">
+                <button mat-icon-button (click)="editarAscenso(ascenso)" matTooltip="Editar">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button (click)="eliminarAscenso(ascenso)" matTooltip="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button (click)="verAscenso(ascenso)" matTooltip="Ver detalles">
+                    <mat-icon>visibility</mat-icon>
+                </button>
+            </div>
+        </td>
+    </ng-container>
+
+    <tr mat-header-row
+        *matHeaderRowDef="['numero', 'accion', 'motivo', 'regimen', 'fechaInicio', 'fechaDocumento', 'documento', 'acciones']">
+    </tr>
+    <tr mat-row
+        *matRowDef="let row; columns: ['numero', 'accion', 'motivo', 'regimen', 'fechaInicio', 'fechaDocumento', 'documento', 'acciones']">
+    </tr>
+</table>
+
+<!-- Agregar paginador -->
+<mat-paginator [length]="100" 
+              [pageSize]="10" 
+              [pageSizeOptions]="[5, 10, 25, 100]"
+              aria-label="Seleccionar página">
+</mat-paginator>
+
+<!-- Formulario principal -->
+<form [formGroup]="ascensoForm">
+  <div class="grid gap-4 mt-4">
+    <!-- Card de datos principales -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Datos principales del documento</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div class="grid grid-cols-3 gap-4">
+          <mat-form-field class="w-full">
+            <mat-label>Tipo de documento</mat-label>
+            <mat-select formControlName="iTipoDocId" required>
+              <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+                {{ tipo.cTipoDocNombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="esCampoInvalido('iTipoDocId')">
+              {{ obtenerMensajeError('iTipoDocId') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Número de documento</mat-label>
+            <input matInput formControlName="cAscNumeroDocumento" required placeholder="Ej: RD-001-2024">
+            <mat-error *ngIf="esCampoInvalido('cAscNumeroDocumento')">
+              {{ obtenerMensajeError('cAscNumeroDocumento') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Fecha de documento</mat-label>
+            <input matInput [matDatepicker]="pickerAscenso" formControlName="dtAscFechaDocumento" required>
+            <mat-datepicker-toggle matSuffix [for]="pickerAscenso"></mat-datepicker-toggle>
+            <mat-datepicker #pickerAscenso></mat-datepicker>
+            <mat-error *ngIf="esCampoInvalido('dtAscFechaDocumento')">
+              {{ obtenerMensajeError('dtAscFechaDocumento') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 mt-4">
+          <app-archivo-handler
+            #archivoHandler
+            [containerClass]="'w-full col-span-3'"
+            [required]="true"
+            (archivo)="onArchivoSelected($event)"
+            (iArchId)="onArchivoIdSelected($event)">
+          </app-archivo-handler>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mt-4">
+          <mat-form-field class="w-full">
+            <mat-label>Régimen laboral</mat-label>
+            <mat-select formControlName="iRegLabId" (selectionChange)="onRegimenChange($event.value)" required>
+              <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+                {{ regimen.cRegLabNombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="ascensoForm.get('iRegLabId')?.errors?.['required']">
+              El régimen laboral es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Acción</mat-label>
+            <mat-select formControlName="iAscAccId" [disabled]="!regimenSeleccionado" 
+              (selectionChange)="onAccionChange($event.value)" required>
+              <mat-option *ngFor="let accion of accionesAscenso" [value]="accion.iAscAccId">
+                {{ accion.cAscAccNombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="ascensoForm.get('iAscAccId')?.errors?.['required']">
+              La acción es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field class="w-full">
+            <mat-label>Motivo de acción</mat-label>
+            <mat-select formControlName="iAscMotId" [disabled]="!accionSeleccionada" required>
+              <mat-option *ngFor="let motivo of motivosAscenso" [value]="motivo.iAscMotId">
+                {{ motivo.cAscMotNombre }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="ascensoForm.get('iAscMotId')?.errors?.['required']">
+              El motivo es requerido
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Card de detalle -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Detalle del documento</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <div class="grid grid-cols-3 gap-4">
+          <mat-form-field class="w-full">
+            <mat-label>Fecha de inicio</mat-label>
+            <input matInput [matDatepicker]="pickerInicioAscenso" formControlName="dtAscFechaInicio" required>
+            <mat-datepicker-toggle matSuffix [for]="pickerInicioAscenso"></mat-datepicker-toggle>
+            <mat-datepicker #pickerInicioAscenso></mat-datepicker>
+            <mat-error *ngIf="ascensoForm.get('dtAscFechaInicio')?.errors?.['required']">
+              La fecha de inicio es requerida
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Solo mostrar si el régimen lo permite -->
+          <ng-container *ngIf="mostrarEscalaCategorias">
+            <mat-form-field class="w-full">
+              <mat-label>Escala / Categoría / Nivel / Grupo</mat-label>
+              <mat-select formControlName="iAscEscCatId" [disabled]="!regimenSeleccionado">
+                <mat-option *ngFor="let escala of escalaCategorias" [value]="escala.iEscCatId">
+                  {{ escala.cEscCatNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field class="w-full">
+              <mat-label>Nueva escala / Categoría / Nivel / Grupo</mat-label>
+              <mat-select formControlName="iAscEscCatIdNueva" [disabled]="!regimenSeleccionado">
+                <mat-option *ngFor="let escala of escalaCategorias" [value]="escala.iEscCatId">
+                  {{ escala.cEscCatNombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+        </div>
+
+        <mat-form-field class="w-full mt-4">
+          <mat-label>Anotaciones</mat-label>
+          <textarea matInput rows="4" formControlName="cAscAnotaciones"
+            placeholder="Ingrese observaciones o comentarios adicionales"></textarea>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Contenedor de botones al final del formulario -->
+  <div class="flex justify-between mt-4">
+    <button type="button" 
+            mat-stroked-button 
+            color="basic" 
+            class="flex items-center gap-2"
+            (click)="retornar()">
+        <mat-icon>arrow_back</mat-icon>
+        <span>RETORNAR</span>
+    </button>
+
+    <div class="flex gap-2">
+        <button type="button" 
+                mat-stroked-button 
+                color="basic" 
+                class="flex items-center gap-2"
+                (click)="limpiarFormulario()">
+            <mat-icon>cleaning_services</mat-icon>
+            <span>LIMPIAR</span>
+        </button>
+
+        <button type="button" 
+                mat-raised-button 
+                color="primary" 
+                class="flex items-center gap-2"
+                (click)="guardarAscenso()">
+            <mat-icon>{{ modoEdicion ? 'update' : 'save' }}</mat-icon>
+            <span>{{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}</span>
+        </button>
+    </div>
+  </div>
+</form> 

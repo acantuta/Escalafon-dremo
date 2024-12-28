@@ -1,0 +1,37 @@
+<mantenimiento-dinamico-component [config]="{
+  titulo: 'Mantenimiento: 2) Incorporación / Acciones de Vinculación',
+  vista: {
+    nombre: 'esc.V_MantenimientoAccionesVinculaciones',
+    columnas: [
+      {
+        campo: 'iAccVincId',
+        label: 'ID',
+        orden: 1
+      },
+      {
+        campo: 'cRegLabNombre',
+        label: 'Régimen Laboral',
+        orden: 2
+      },
+      {
+        campo: 'cAccVincNombre',
+        label: 'Nombre',
+        orden: 3
+      }
+    ]
+  },
+  tabla: 'esc.acciones_vinculaciones',
+  labels: {
+    'cAccVincNombre': 'Nombre de la Acción',
+    'cAccVincDescripcion': 'Descripción',
+    'iRegLabId': 'Régimen Laboral'
+  },
+  dependencias: [
+    {
+      campo: 'iRegLabId',
+      tabla: 'esc.regimenes_laborales',
+      campoClave: 'iRegLabId',
+      campoMostrar: 'cRegLabNombre'
+    }
+  ]
+}"></mantenimiento-dinamico-component> 

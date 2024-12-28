@@ -1,0 +1,282 @@
+<div class="pt-4">
+  <!-- Tabla de ceses -->
+  <table mat-table [dataSource]="dataSource" class="w-full mb-4">
+    <!-- Columna N° -->
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef> N° </th>
+      <td mat-cell *matCellDef="let i = index"> {{ i + 1 }} </td>
+    </ng-container>
+
+    <!-- Columna Acción -->
+    <ng-container matColumnDef="accion">
+      <th mat-header-cell *matHeaderCellDef> Acción </th>
+      <td mat-cell *matCellDef="let row"> {{ row.cCesAccNombre }} </td>
+    </ng-container>
+
+    <!-- Columna Motivo -->
+    <ng-container matColumnDef="motivo">
+      <th mat-header-cell *matHeaderCellDef> Motivo </th>
+      <td mat-cell *matCellDef="let row"> {{ row.cCesMotAccNombre }} </td>
+    </ng-container>
+
+    <!-- Columna Régimen -->
+    <ng-container matColumnDef="regimen">
+      <th mat-header-cell *matHeaderCellDef> Régimen </th>
+      <td mat-cell *matCellDef="let row"> {{ row.cRegLabNombre }} </td>
+    </ng-container>
+
+    <!-- Columna Nro de documento -->
+    <ng-container matColumnDef="nroDocumento">
+      <th mat-header-cell *matHeaderCellDef> Nro de documento </th>
+      <td mat-cell *matCellDef="let row"> {{ row.cCesesNumeroDocumento }} </td>
+    </ng-container>
+
+    <!-- Columna Fecha cese -->
+    <ng-container matColumnDef="fechaCese">
+      <th mat-header-cell *matHeaderCellDef> Fecha cese </th>
+      <td mat-cell *matCellDef="let row"> {{ row.dtCesesFechaCese | date:'dd/MM/yyyy' }} </td>
+    </ng-container>
+
+    <!-- Columna Acciones -->
+    <ng-container matColumnDef="acciones">
+      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+      <td mat-cell *matCellDef="let row">
+        <button mat-icon-button (click)="editarRegistro(row)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="eliminarRegistro(row)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button (click)="verRegistro(row)">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+    <!-- Mensaje cuando no hay datos -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell text-center py-4" colspan="7">
+        No se encontraron registros de ceses
+      </td>
+    </tr>
+  </table>
+
+  <!-- Paginador -->
+  <mat-paginator 
+    [length]="totalRegistros"
+    [pageSize]="tamanioPagina"
+    [pageSizeOptions]="[5, 10, 25, 50]"
+    showFirstLastButtons
+    aria-label="Seleccionar página">
+  </mat-paginator>
+
+  <!-- Formulario -->
+  <form [formGroup]="ceseForm">
+    <!-- Datos principales del documento -->
+    <div class="mt-8 p-4 border rounded-lg">
+      <h3 class="text-lg font-medium mb-4">
+        {{ modoVisualizacion ? 'Visualización de documento' : 
+            modoEdicion ? 'Edición de documento' : 
+            'Datos principales del documento' }}
+      </h3>
+
+      <div class="grid grid-cols-3 gap-4">
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('iTipoDocId')" class="campo-requerido">
+          <mat-label>Tipo de documento</mat-label>
+          <mat-select formControlName="iTipoDocId" required>
+            <mat-option *ngFor="let tipo of tiposDocumento" [value]="tipo.iTipoDocId">
+              {{ tipo.cTipoDocNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="validarCampo('iTipoDocId')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('cCesesNumeroDocumento')" class="campo-requerido">
+          <mat-label>Número de documento</mat-label>
+          <input matInput formControlName="cCesesNumeroDocumento" required>
+          <mat-error *ngIf="validarCampo('cCesesNumeroDocumento')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('dtCesesFechaDocumento')" class="campo-requerido">
+          <mat-label>Fecha de documento</mat-label>
+          <input matInput [matDatepicker]="fechaDoc" formControlName="dtCesesFechaDocumento" required>
+          <mat-datepicker-toggle matSuffix [for]="fechaDoc"></mat-datepicker-toggle>
+          <mat-datepicker #fechaDoc></mat-datepicker>
+          <mat-error *ngIf="validarCampo('dtCesesFechaDocumento')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Sección de archivo -->
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div>
+          <div class="campo-requerido">
+            <app-archivo-handler 
+              [containerClass]="'w-full'" 
+              (archivo)="onArchivoSelected($event)"
+              (iArchId)="onArchivoIdSelected($event)" 
+              [class.error]="validarCampo('iArchId')"
+              [archivoId]="ceseForm.get('iArchId')?.value"
+              [required]="true">
+            </app-archivo-handler>
+            <mat-error *ngIf="validarCampo('iArchId')" class="text-red-500 text-sm mt-1">
+              El archivo es requerido
+            </mat-error>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campos adicionales -->
+      <div class="grid grid-cols-3 gap-4">
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('iRegLabId')" class="campo-requerido">
+          <mat-label>Régimen laboral</mat-label>
+          <mat-select formControlName="iRegLabId" required (selectionChange)="onRegimenChange($event.value)">
+            <mat-option *ngFor="let regimen of regimenesLaborales" [value]="regimen.iRegLabId">
+              {{ regimen.cRegLabNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="validarCampo('iRegLabId')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('iCesAccId')" class="campo-requerido">
+          <mat-label>Acción</mat-label>
+          <mat-select formControlName="iCesAccId" 
+                     [disabled]="isControlDisabled('iCesAccId') || !camposHabilitados || !ceseForm.get('iRegLabId')?.value"
+                     required 
+                     (selectionChange)="onAccionChange($event.value)">
+            <mat-option *ngFor="let accion of cesacionesAcciones" [value]="accion.iCesAccId">
+              {{ accion.cCesAccNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="validarCampo('iCesAccId')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field [class.mat-form-field-invalid]="validarCampo('iCesMotAccId')" class="campo-requerido">
+          <mat-label>Motivo de acción</mat-label>
+          <mat-select formControlName="iCesMotAccId" 
+                     [disabled]="isControlDisabled('iCesMotAccId') || !camposHabilitados || !ceseForm.get('iCesAccId')?.value"
+                     required>
+            <mat-option *ngFor="let motivo of motivosAccion" [value]="motivo.iCesMotAccId">
+              {{ motivo.cCesMotAccNombre }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="validarCampo('iCesMotAccId')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Detalle del documento -->
+    <div class="mt-8 p-4 border rounded-lg">
+      <h3 class="text-lg font-medium mb-4">Detalle del documento</h3>
+
+      <div class="mb-4">
+        <mat-form-field class="w-full" [class.mat-form-field-invalid]="validarCampo('dtCesesFechaCese')">
+          <mat-label>Fecha de cese</mat-label>
+          <input matInput [matDatepicker]="fechaCese" formControlName="dtCesesFechaCese" required>
+          <mat-datepicker-toggle matSuffix [for]="fechaCese"></mat-datepicker-toggle>
+          <mat-datepicker #fechaCese></mat-datepicker>
+          <mat-error *ngIf="validarCampo('dtCesesFechaCese')">
+            Este campo es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tiempo de servicio -->
+      <div class="border border-blue-100 rounded p-4 mb-4">
+        <h4 class="mb-4">Tiempo de servicio</h4>
+        <div class="grid grid-cols-3 gap-4">
+          <mat-form-field [class.mat-form-field-invalid]="validarCampo('iCesesServicioAnios')" class="campo-requerido">
+            <mat-label>Años</mat-label>
+            <input matInput 
+                   type="number" 
+                   formControlName="iCesesServicioAnios" 
+                   required 
+                   min="0"
+                   [class.ng-invalid]="ceseForm.get('iCesesServicioAnios')?.invalid && ceseForm.get('iCesesServicioAnios')?.touched">
+            <mat-error *ngIf="validarCampo('iCesesServicioAnios')">
+              Este campo es requerido y debe ser mayor o igual a 0
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [class.mat-form-field-invalid]="validarCampo('iCesesServicioMeses')" class="campo-requerido">
+            <mat-label>Meses</mat-label>
+            <input matInput 
+                   type="number" 
+                   formControlName="iCesesServicioMeses" 
+                   required 
+                   min="0" 
+                   max="11"
+                   [class.ng-invalid]="ceseForm.get('iCesesServicioMeses')?.invalid && ceseForm.get('iCesesServicioMeses')?.touched">
+            <mat-error *ngIf="validarCampo('iCesesServicioMeses')">
+              Este campo es requerido y debe estar entre 0 y 11
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [class.mat-form-field-invalid]="validarCampo('iCesesServicioDias')" class="campo-requerido">
+            <mat-label>Días</mat-label>
+            <input matInput 
+                   type="number" 
+                   formControlName="iCesesServicioDias" 
+                   required 
+                   min="0" 
+                   max="30"
+                   [class.ng-invalid]="ceseForm.get('iCesesServicioDias')?.invalid && ceseForm.get('iCesesServicioDias')?.touched">
+            <mat-error *ngIf="validarCampo('iCesesServicioDias')">
+              Este campo es requerido y debe estar entre 0 y 30
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <mat-form-field class="w-full">
+        <mat-label>Anotaciones</mat-label>
+        <textarea matInput rows="4" formControlName="cCesesAnotaciones"></textarea>
+      </mat-form-field>
+    </div>
+
+    <!-- Contenedor de botones con espaciado -->
+    <div class="flex justify-between mt-4">
+      <!-- Botón Retornar (siempre visible) -->
+      <button mat-stroked-button color="basic" 
+              class="flex items-center gap-2" 
+              routerLink="legajo/principal">
+        <mat-icon>arrow_back</mat-icon>
+        <span>RETORNAR</span>
+      </button>
+
+      <!-- Contenedor botones derecha -->
+      <div class="flex gap-2">
+        <!-- Botón Limpiar/Cerrar -->
+        <button mat-stroked-button color="basic" 
+                class="flex items-center gap-2" 
+                (click)="limpiar()">
+          <mat-icon>{{ modoVisualizacion ? 'close' : 'cleaning_services' }}</mat-icon>
+          <span>{{ modoVisualizacion ? 'CERRAR' : 'LIMPIAR' }}</span>
+        </button>
+
+        <!-- Botón Guardar/Actualizar (oculto en modo visualización) -->
+        <button mat-raised-button color="primary" 
+                class="flex items-center gap-2" 
+                (click)="onGuardar()"
+                *ngIf="!modoVisualizacion">
+          <mat-icon>save</mat-icon>
+          <span>{{ modoEdicion ? 'ACTUALIZAR' : 'GUARDAR' }}</span>
+        </button>
+      </div>
+    </div>
+  </form>
+</div> 

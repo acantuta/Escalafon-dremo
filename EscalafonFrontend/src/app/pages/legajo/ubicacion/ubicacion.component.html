@@ -1,0 +1,120 @@
+<div class="p-4">
+  <form [formGroup]="ubicacionForm">
+    <!-- Ubicación -->
+    <mat-card class="mb-6">
+      <mat-card-header>
+        <mat-card-title>Ubicación física del legajo</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-4">
+        <!-- Datos principales con diseño responsivo -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <mat-form-field>
+            <mat-label>Ambiente</mat-label>
+            <input matInput formControlName="cLegUbiAmbiente">
+            <mat-error *ngIf="ubicacionForm.get('cLegUbiAmbiente')?.errors?.['required']">
+              El ambiente es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Estante</mat-label>
+            <input matInput formControlName="cLegUbiEstante">
+            <mat-error *ngIf="ubicacionForm.get('cLegUbiEstante')?.errors?.['required']">
+              El estante es requerido
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Caja</mat-label>
+            <input matInput formControlName="cLegUbiCaja">
+          </mat-form-field>
+        </div>
+
+        <!-- Folios por sección -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h2 class="text-lg font-medium mb-4">Folios por sección</h2>
+          <!-- Grid responsivo para secciones -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <mat-form-field>
+              <mat-label>Sección 1</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion1Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 2</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion2Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 3</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion3Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 4</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion4Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 5</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion5Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 6</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion6Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 7</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion7Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 8</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion8Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 9</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion9Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 10</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion10Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 11</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion11Folios">
+            </mat-form-field>
+
+            <mat-form-field>
+              <mat-label>Sección 12</mat-label>
+              <input matInput type="number" formControlName="cLegUbiSeccion12Folios">
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Botones de acción con diseño responsivo -->
+    <div class="flex flex-col sm:flex-row justify-between gap-4">
+      <button mat-stroked-button 
+              class="w-full sm:w-auto flex items-center justify-center gap-2"
+              routerLink="/principal/inicio">
+        <mat-icon>arrow_back</mat-icon>
+        RETORNAR
+      </button>
+      <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <button mat-raised-button color="primary" 
+                class="flex items-center justify-center gap-2"
+                (click)="guardar()">
+          <mat-icon>save</mat-icon>
+          GUARDAR
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

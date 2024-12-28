@@ -1,0 +1,35 @@
+<mantenimiento-dinamico-component [config]="{
+    titulo: 'Mantenimiento: General / Acciones de Compensación',
+    vista: {
+      nombre: 'esc.V_MantenimientoCompensacionesAcciones',
+      columnas: [
+        {
+          campo: 'iCompAccId',
+          label: 'ID',
+          orden: 1
+        },
+        {
+          campo: 'cRegLabNombre',
+          label: 'Régimen Laboral',
+          orden: 2
+        },
+        {
+          campo: 'cCompAccNombre',
+          label: 'Nombre',
+          orden: 3
+        }
+      ]
+    },
+    tabla: 'esc.compensaciones_acciones',
+    dependencias: [
+      {
+        campo: 'iRegLabId',
+        tabla: 'esc.regimenes_laborales',
+        campoClave: 'iRegLabId',
+        campoMostrar: 'cRegLabNombre'
+      }
+    ],
+    labels: {
+      'iRegLabId': 'Régimen Laboral'
+    }
+  }"></mantenimiento-dinamico-component>
