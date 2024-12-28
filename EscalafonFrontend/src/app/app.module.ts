@@ -159,6 +159,7 @@ import { EdicionComponent } from './pages/legajo/edicion/edicion.component';
 import { UbicacionComponent } from './pages/legajo/ubicacion/ubicacion.component';
 import { UppercaseInputDirective } from './shared/directives/uppercase.directive';
 import { CustomDateAdapter } from './core/adapters/custom-date.adapter';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 registerLocaleData(localeEs, 'es-PE');
 
 @NgModule({
@@ -284,7 +285,8 @@ registerLocaleData(localeEs, 'es-PE');
     MantenimientoZonasComponent,
     EdicionComponent,
     UbicacionComponent,
-    UppercaseInputDirective
+    UppercaseInputDirective,
+    DashboardComponent
   ],
   imports: [
     BrowserModule,

@@ -47,7 +47,7 @@ export class LoginComponent {
         this.loading = false;
         if (response.status === 'success') {
           this.authService.setToken(response.access_token);
-          this.router.navigate(['/principal/inicio']);
+          this.router.navigate(['/principal/dashboard']);
         } else {
           this.showError(response.message || 'Error al iniciar sesión');
         }

@@ -98,6 +98,7 @@ import { MantenimientoTiposServidoresComponent } from './pages/mantenimiento/man
 import { MantenimientoZonasComponent } from './pages/mantenimiento/mantenimiento-zonas/mantenimiento-zonas.component';
 import { EdicionComponent } from './pages/legajo/edicion/edicion.component';
 import { UbicacionComponent } from './pages/legajo/ubicacion/ubicacion.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent},
@@ -107,6 +108,7 @@ const routes: Routes = [
     canActivate: [authGuard],
     children: [
     { path: 'inicio', component: InicioComponent},
+    { path: 'dashboard', component: DashboardComponent},
     { path: 'legajo/apertura', component: AperturaLegajoComponent},
     { path: 'legajo/edicion/:id', component: EdicionComponent },
     { path: 'legajo', component: LegajoComponent, children: [
