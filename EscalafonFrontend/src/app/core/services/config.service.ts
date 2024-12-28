@@ -104,4 +104,8 @@ export class ConfigService {
   getApiBaseUrl(): string {
     return this.config.api.baseUrl;
   }
+
+  getRecuperarPasswordUrl(): string {
+    return this.config.auth.recuperarPasswordUrl;
+  }
 } 

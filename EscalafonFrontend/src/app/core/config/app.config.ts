@@ -34,6 +34,9 @@ export const APP_CONFIG = {
     baseUrl: !isDevMode()
       ? 'http://localhost:9084/api/escalafon'
       : 'http://127.0.0.1:8000/api/escalafon'
+  },
+  auth: {
+    recuperarPasswordUrl: 'http://45.169.92.186:9080/sesion/recuperar-password'
   }
 } as const;
 

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ConfigService } from '../../core/services/config.service';
 
 interface ErrorResponse {
   status: string;
@@ -25,7 +26,8 @@ export class LoginComponent {
   constructor(
     private authService: AuthService, 
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    public configService: ConfigService
   ) {}
 
   login() {
