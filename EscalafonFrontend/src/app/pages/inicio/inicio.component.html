@@ -21,8 +21,12 @@
         <mat-label>Número de documento</mat-label>
         <input matInput 
                formControlName="numeroDocumento" 
-               (keydown.enter)="handleEnterKey($event)"
-               uppercase>
+               (keydown.enter)="$event.preventDefault(); buscar()"
+               (blur)="validarNumeroDocumento()"
+               [maxLength]="searchForm.get('tipoDocumento')?.value === DNI_ID ? 8 : null">
+        <mat-error *ngIf="searchForm.get('numeroDocumento')?.errors?.['dniInvalido']">
+          El DNI debe contener 8 dígitos numéricos
+        </mat-error>
       </mat-form-field>
     </div>
 

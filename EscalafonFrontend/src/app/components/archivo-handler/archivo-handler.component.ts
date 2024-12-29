@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 import { ConfigService } from '../../core/services/config.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-archivo-handler',
@@ -84,7 +85,8 @@ export class ArchivoHandlerComponent {
     private snackBar: MatSnackBar,
     private http: HttpClient,
     private configService: ConfigService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {
     this.archivoForm = this.fb.group({
       iFolios: [null],
@@ -248,7 +250,13 @@ export class ArchivoHandlerComponent {
     if (!this.archivoActual?.cArchUuid) return;
     
     const url = this.configService.getArchivoDownloadUrl(this.archivoActual.cArchUuid);
-    window.open(url, '_blank');
+    const token = this.authService.getToken();
+    
+    // Agregar el token como parámetro de consulta
+    const urlWithToken = `${url}?token=${token}`;
+    
+    // Abrir en nueva pestaña
+    window.open(urlWithToken, '_blank');
   }
 
   limpiar(): void {

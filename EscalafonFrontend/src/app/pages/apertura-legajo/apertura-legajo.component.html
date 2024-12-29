@@ -1,13 +1,13 @@
 <!-- Contenedor principal -->
-<div class="p-4">
+<div class="p-2 md:p-4">
   <!-- Título de la página -->
-  <h1 class="text-xl font-bold mb-4">Apertura de legajo</h1>
+  <h1 class="text-lg md:text-xl font-bold mb-4">Apertura de legajo</h1>
 
   <!-- Formulario principal -->
   <form [formGroup]="legajoForm">
     <!-- Sección de búsqueda -->
-    <div class="flex gap-4 mb-6">
-      <mat-form-field class="flex-1">
+    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+      <mat-form-field class="w-full">
         <mat-label>Tipo de apertura</mat-label>
         <mat-select formControlName="iTipoAperLegId">
           <mat-option *ngFor="let tipo of tiposApertura" [value]="tipo.iTipoAperLegId">
@@ -16,7 +16,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field class="flex-1">
+      <mat-form-field class="w-full">
         <mat-label>Tipo de documento</mat-label>
         <mat-select formControlName="iTipoIdentId">
           <mat-option *ngFor="let tipo of tiposDocumentoIdentificacion" [value]="tipo.iTipoDocIdenId">
@@ -25,12 +25,18 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field class="flex-1">
+      <mat-form-field class="w-full">
         <mat-label>Número de documento</mat-label>
-        <input matInput formControlName="numeroDocumento" uppercase>
+        <input matInput 
+               formControlName="numeroDocumento" 
+               uppercase
+               (keydown.enter)="$event.preventDefault(); buscarPersona()">
       </mat-form-field>
 
-      <button mat-raised-button color="primary" type="button" (click)="buscarPersona()">BUSCAR</button>
+      <button mat-raised-button color="primary" type="button" (click)="buscarPersona()" 
+              >
+              BUSCAR
+      </button>
     </div>
 
     <!-- Contenido que se muestra después de buscar -->
@@ -38,10 +44,10 @@
       <!-- Datos del servidor público -->
       <mat-card class="mb-6">
         <mat-card-header>
-          <mat-card-title>Datos del servidor público</mat-card-title>
+          <mat-card-title class="text-base md:text-lg">Datos del servidor público</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="grid grid-cols-5 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <mat-form-field class="flex-1">
               <mat-label>Primer apellido</mat-label>
               <input matInput formControlName="cLegPrimerApellido" uppercase>
@@ -94,10 +100,10 @@
       <!-- Datos principales del documento -->
       <mat-card class="mb-6">
         <mat-card-header>
-          <mat-card-title>Datos principales del documento</mat-card-title>
+          <mat-card-title class="text-base md:text-lg">Datos principales del documento</mat-card-title>
         </mat-card-header>
         <mat-card-content>
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <mat-form-field class="flex-1">
               <mat-label>Tipo de documento</mat-label>
               <mat-select formControlName="iTipoDocId">
@@ -123,8 +129,8 @@
             </mat-form-field>
 
             <!-- Sección de documento y folios -->
-            <div class="col-span-3 grid grid-cols-3">
-              <div class="flex gap-4">
+            <div class="col-span-1 sm:col-span-2 lg:col-span-3">
+              <div class="flex flex-col sm:flex-row gap-4">
                 <app-archivo-handler
                   [containerClass]="'w-full'"
                   (archivo)="onArchivoSeleccionado($event)">
@@ -184,12 +190,12 @@
       <!-- Datos del centro laboral -->
       <mat-card class="mb-6">
         <mat-card-header>
-          <mat-card-title>Datos del centro laboral</mat-card-title>
+          <mat-card-title class="text-base md:text-lg">Datos del centro laboral</mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <!-- Información del centro educativo -->
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <mat-form-field>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <mat-form-field class="w-full">
               <mat-label>Código modular IE</mat-label>
               <input matInput formControlName="codigoModularIE" readonly>
               <button mat-icon-button matSuffix (click)="buscarCentroLaboral()">
@@ -199,23 +205,25 @@
           </div>
 
           <!-- Tabla de información -->
-          <table class="w-full mb-4" *ngIf="centroLaboralSeleccionado">
-            <tr>
-              <td class="font-bold">Centro laboral</td>
-              <td>{{centroLaboralSeleccionado.cCentLabNombre}}</td>
-              <td class="font-bold">Modalidad educativa</td>
-              <td>{{centroLaboralSeleccionado.cModEduNombre}}</td>
+          <div class="overflow-x-auto mb-4" *ngIf="centroLaboralSeleccionado">
+          <table class="w-full min-w-[600px]">
+            <tr class="border-b">
+              <td class="py-2 font-bold w-1/4">Centro laboral</td>
+              <td class="py-2 w-1/4">{{centroLaboralSeleccionado.cCentLabNombre}}</td>
+              <td class="py-2 font-bold w-1/4">Modalidad educativa</td>
+              <td class="py-2 w-1/4">{{centroLaboralSeleccionado.cModEduNombre}}</td>
             </tr>
             <tr>
-              <td class="font-bold">Región</td>
-              <td>{{centroLaboralSeleccionado.cDirRegNombre}}</td>
-              <td class="font-bold">Instancia de gestión</td>
-              <td>{{centroLaboralSeleccionado.cInstGeEduNombre}}</td>
+              <td class="py-2 font-bold">Región</td>
+              <td class="py-2">{{centroLaboralSeleccionado.cDirRegNombre}}</td>
+              <td class="py-2 font-bold">Instancia de gestión</td>
+              <td class="py-2">{{centroLaboralSeleccionado.cInstGeEduNombre}}</td>
             </tr>
           </table>
+          </div>
 
           <!-- Campos adicionales -->
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Condición laboral primero -->
             <mat-form-field>
               <mat-label>Condición Laboral</mat-label>
@@ -340,7 +348,7 @@
               <mat-datepicker #fechaFin></mat-datepicker>
             </mat-form-field>
 
-            <mat-form-field class="col-span-3">
+            <mat-form-field class="col-span-1 sm:col-span-2 lg:col-span-3">
               <mat-label>Anotaciones</mat-label>
               <textarea matInput formControlName="cLegAnotaciones" rows="4" uppercase></textarea>
             </mat-form-field>
@@ -350,17 +358,17 @@
     </ng-container>
 
     <!-- Botones de acción -->
-    <div class="flex justify-between">
-      <button mat-stroked-button routerLink="/principal/inicio">
+    <div class="flex flex-col sm:flex-row justify-between gap-4">
+      <button mat-stroked-button routerLink="/principal/inicio" class="w-full sm:w-auto">
         <mat-icon>arrow_back</mat-icon>
         RETORNAR
       </button>
-      <div class="flex gap-2">
-        <button mat-stroked-button>
+      <div class="flex flex-col sm:flex-row gap-2">
+        <button mat-stroked-button class="w-full sm:w-auto">
           <mat-icon>cleaning_services</mat-icon>
           LIMPIAR
         </button>
-        <button mat-raised-button color="primary" (click)="guardarLegajo()">
+        <button mat-raised-button color="primary" (click)="guardarLegajo()" class="w-full sm:w-auto">
           <mat-icon>save</mat-icon>
           GUARDAR
         </button>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TipoDocumentoIdentificacionService } from '../../services/tipo-documento-identificacion.service';
 import { TipoDocumentoIdentificacion } from '../../interfaces/tipo-documento-identificacion';
 import { CondicionLaboralService } from '../../services/condicion-laboral.service';
@@ -40,6 +40,7 @@ export class InicioComponent implements OnInit {
   tamanioPagina: number = 10;
   paginaActual: number = 0;
   busquedaRealizada: boolean = false;
+  readonly DNI_ID = 1;
 
   constructor(
     private tipoDocumentoService: TipoDocumentoIdentificacionService,
@@ -66,6 +67,14 @@ export class InicioComponent implements OnInit {
       instanciaGestionEducativa: [''],
       codigoModular: [''],
       centroLaboral: ['']
+    });
+
+    // Suscribirse a los cambios del tipo de documento
+    this.searchForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
+      const numeroDocumentoControl = this.searchForm.get('numeroDocumento');
+      if (value === this.DNI_ID) {
+        numeroDocumentoControl?.setValue(numeroDocumentoControl.value?.replace(/\D/g, ''));
+      }
     });
   }
 
@@ -97,8 +106,13 @@ export class InicioComponent implements OnInit {
   private loadTiposDocumento(): void {
     this.tipoDocumentoService.getAll().subscribe({
       next: (tipos) => {
-        console.log('Tipos de documento cargados:', tipos); // Para verificar los datos
         this.tiposDocumento = tipos;
+        // Autoseleccionar el primer tipo de documento si existe
+        if (tipos && tipos.length > 0) {
+          this.searchForm.patchValue({
+            tipoDocumento: tipos[0].iTipoDocIdenId
+          });
+        }
       },
       error: (error) => console.error('Error cargando tipos de documento:', error)
     });
@@ -240,5 +254,21 @@ export class InicioComponent implements OnInit {
     this.snackBar.open('Formulario limpiado', 'Cerrar', {
       duration: 3000
     });
+  }
+
+  validarNumeroDocumento(): void {
+    const tipoDocumento = this.searchForm.get('tipoDocumento')?.value;
+    const numeroDocumentoControl = this.searchForm.get('numeroDocumento');
+    const numeroDocumento = numeroDocumentoControl?.value;
+
+    if (tipoDocumento === this.DNI_ID) {
+      if (!/^\d{8}$/.test(numeroDocumento)) {
+        numeroDocumentoControl?.setErrors({ 'dniInvalido': true });
+      } else {
+        numeroDocumentoControl?.setErrors(null);
+      }
+    } else {
+      numeroDocumentoControl?.setErrors(null);
+    }
   }
 }

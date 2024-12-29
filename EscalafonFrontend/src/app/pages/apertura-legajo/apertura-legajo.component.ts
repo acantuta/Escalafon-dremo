@@ -487,7 +487,8 @@ export class AperturaLegajoComponent implements OnInit {
                     dtLegFechaNacimiento: persona.dPersNacimiento || null,
                     iPersId: persona.iPersId,
                     iTipoIdentIdPrincipal: tipoDocumento,
-                    cLegNumeroDocumentoIdentida: numeroDocumento
+                    cLegNumeroDocumentoIdentida: numeroDocumento,
+                    cLegSexo: persona.cPersSexo || ''
                 });
                 this.snackBar.open('Persona encontrada', 'Cerrar', {
                     duration: 3000
