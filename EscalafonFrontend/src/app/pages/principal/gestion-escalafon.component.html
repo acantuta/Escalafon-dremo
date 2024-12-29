@@ -1,6 +1,53 @@
 <div class="mat-app-background min-h-screen flex flex-col overflow-auto">
+  <!-- Sidebar -->
+  <div 
+    class="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+    [class.opacity-0]="!isMenuOpen"
+    [class.pointer-events-none]="!isMenuOpen"
+    (click)="toggleMenu()"
+  ></div>
+
+  <div 
+    class="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-xl z-50 transform transition-transform duration-300"
+    [class.translate-x-0]="isMenuOpen"
+    [class.-translate-x-full]="!isMenuOpen"
+  >
+    <div class="h-14 bg-primary flex items-center px-4 text-white font-medium">
+      Menu Principal
+    </div>
+    
+    <!-- Menú con validaciones -->
+    <ng-container *ngIf="hasAnyPermission">
+      <nav class="py-2">
+        <ng-container *ngFor="let item of menuItems">
+          <a *ngIf="hasPermission(item.requiredPermission)"
+             [routerLink]="item.route"
+             class="flex items-center h-12 px-4 text-gray-700 hover:bg-gray-100"
+             routerLinkActive="bg-gray-100">
+            <mat-icon class="mr-3">{{item.icon}}</mat-icon>
+            {{item.title}}
+          </a>
+        </ng-container>
+      </nav>
+    </ng-container>
+
+    <!-- Mensaje cuando no hay permisos -->
+    <div *ngIf="!hasAnyPermission" class="p-4 text-center text-gray-500">
+      <mat-icon class="text-4xl mb-2">lock</mat-icon>
+      <p>No tiene permisos para acceder a ningún módulo</p>
+    </div>
+  </div>
+
   <mat-toolbar color="primary" class="flex justify-between items-center flex-shrink-0 h-14">
     <div class="h-full flex items-center gap-4 p-1">
+      <!-- Agregar botón hamburguesa -->
+      <button 
+        (click)="toggleMenu()" 
+        class="w-10 h-10 flex items-center justify-center hover:bg-white/10 rounded-lg"
+      >
+        <mat-icon>menu</mat-icon>
+      </button>
+
       <a routerLink="/principal/dashboard" class="h-full bg-white h-full w-auto rounded p-1">
         <img src="assets/images/logo.png" alt="Logo Moquegua" class="h-full w-auto">
       </a>

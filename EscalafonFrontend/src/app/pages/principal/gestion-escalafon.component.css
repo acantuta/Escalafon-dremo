@@ -1,0 +1,15 @@
+.pointer-events-none {
+  pointer-events: none;
+}
+
+.transform {
+  transform: translateX(0);
+}
+
+.-translate-x-full {
+  transform: translateX(-100%);
+}
+
+.translate-x-0 {
+  transform: translateX(0);
+}

@@ -32,7 +32,7 @@ export const APP_CONFIG = {
   },
   api: {
     baseUrl: !isDevMode()
-      ? 'http://localhost:9084/api/escalafon'
+      ? 'http://45.169.92.186:9084/api/escalafon'
       : 'http://127.0.0.1:8000/api/escalafon'
   },
   auth: {
@@ -52,4 +52,4 @@ export {
   RegimenConEscalaCategoriaGrupo,
   RegimenPensionarioPublico,
   RegimenPensionarioPrivado 
-}; 
+};

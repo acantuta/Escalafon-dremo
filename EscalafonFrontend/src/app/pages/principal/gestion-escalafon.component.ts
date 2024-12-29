@@ -7,6 +7,13 @@ import { VLegajo } from '../../interfaces/v-legajo';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { AuthService } from '../../services/auth.service';
 
+interface MenuItem {
+  icon: string;
+  title: string;
+  route: string;
+  requiredPermission: string;
+}
+
 @Component({
   selector: 'app-gestion-escalafon',
   templateUrl: './gestion-escalafon.component.html',
@@ -28,6 +35,28 @@ export class GestionEscalafonComponent implements OnInit {
   userName = '';
   tieneAccesoMantenimiento = false;
   tieneAccesoAreaUsuaria = false;
+  isMenuOpen = false;
+
+  menuItems: MenuItem[] = [
+    {
+      icon: 'dashboard',
+      title: 'Inicio',
+      route: '/principal/dashboard',
+      requiredPermission: ''
+    },
+    {
+      icon: 'person_search',
+      title: 'Gestión de Legajos',
+      route: '/principal/inicio',
+      requiredPermission: 'area-usuaria'
+    },
+    {
+      icon: 'build',
+      title: 'Mantenimiento',
+      route: '/principal/mantenimiento',
+      requiredPermission: 'mantenimiento'
+    }
+  ];
 
   constructor(
     private router: Router,
@@ -116,5 +145,17 @@ export class GestionEscalafonComponent implements OnInit {
         this.router.navigate(['/auth/login']);
       }
     });
+  }
+
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  hasPermission(permission: string): boolean {
+    return permission === '' || this.authService.hasPermission(permission);
+  }
+
+  get hasAnyPermission(): boolean {
+    return this.menuItems.some(item => this.hasPermission(item.requiredPermission));
   }
 }
