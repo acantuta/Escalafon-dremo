@@ -19,6 +19,7 @@ Route::prefix('escalafon/mantenimiento-dinamico')->group(function () {
 
 // Rutas de autenticación
 Route::post('escalafon/login', [AuthController::class, 'login']);
+Route::post('escalafon/verificar-codigo', [AuthController::class, 'verificarCodigo']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('escalafon/logout', [AuthController::class, 'logout']);

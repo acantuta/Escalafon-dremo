@@ -30,6 +30,18 @@ interface JwtPayload {
   permisos: string[];
 }
 
+interface VerificationResponse {
+  status: string;
+  access_token?: string;
+  token_type?: string;
+  expires_in?: number;
+  user?: {
+    id: number;
+    usuario: string;
+  };
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -110,5 +122,18 @@ export class AuthService {
       console.error('Error decoding token:', error);
       return false;
     }
+  }
+
+  verifyCode(username: string, code: string): Observable<VerificationResponse> {
+    return this.http.post<VerificationResponse>(`${this.apiUrl}/verificar-codigo`, {
+      username,
+      codigo: code
+    }).pipe(
+      tap(response => {
+        if (response.status === 'success' && response.access_token) {
+          this.setToken(response.access_token);
+        }
+      })
+    );
   }
 }

@@ -9,7 +9,8 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 class JwtMiddleware
 {
     protected $except = [
-        'api/escalafon/login'
+        'api/escalafon/login',
+        'api/escalafon/verificar-codigo'
     ];
 
     public function handle($request, Closure $next)
