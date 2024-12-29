@@ -161,80 +161,90 @@
       </button>
     </div>
 
-    <div class="overflow-x-auto">
-      <table mat-table [dataSource]="resultados" class="w-full min-w-[800px]">
-        <!-- N° Column -->
-        <ng-container matColumnDef="nro">
-          <th mat-header-cell *matHeaderCellDef>N°</th>
-          <td mat-cell *matCellDef="let row; let i = index">{{i + 1}}</td>
-        </ng-container>
-
-        <!-- Documento Column -->
-        <ng-container matColumnDef="documento">
-          <th mat-header-cell *matHeaderCellDef>DOCUMENTO</th>
-          <td mat-cell *matCellDef="let row">{{row.cLegNumeroDocumentoIdentida}}</td>
-        </ng-container>
-
-        <!-- Apellidos y Nombres Column -->
-        <ng-container matColumnDef="apellidosNombres">
-          <th mat-header-cell *matHeaderCellDef>APELLIDOS Y NOMBRES</th>
-          <td mat-cell *matCellDef="let row">{{row.cLegPrimerApellido}} {{row.cLegSegundoApellido}}, {{row.cLegNombres}}</td>
-        </ng-container>
-
-        <!-- Centro Laboral Column -->
-        <ng-container matColumnDef="centroLaboral">
-          <th mat-header-cell *matHeaderCellDef>CENTRO LABORAL</th>
-          <td mat-cell *matCellDef="let row">{{row.cCentLabNombre}}</td>
-        </ng-container>
-
-        <!-- Condición Laboral Column -->
-        <ng-container matColumnDef="condicionLaboral">
-          <th mat-header-cell *matHeaderCellDef>CONDICIÓN LABORAL</th>
-          <td mat-cell *matCellDef="let row">{{row.cCondLabNombre}}</td>
-        </ng-container>
-
-        <!-- Situación Laboral Column -->
-        <ng-container matColumnDef="situacionLaboral">
-          <th mat-header-cell *matHeaderCellDef>SITUACIÓN LABORAL</th>
-          <td mat-cell *matCellDef="let row">{{row.cSitLabNombre}}</td>
-        </ng-container>
-
-        <!-- Régimen Laboral Column -->
-        <ng-container matColumnDef="regimenLaboral">
-          <th mat-header-cell *matHeaderCellDef>RÉGIMEN LABORAL</th>
-          <td mat-cell *matCellDef="let row">{{row.cRegLabNombre}}</td>
-        </ng-container>
-
-        <!-- Acción Column -->
-        <ng-container matColumnDef="accion">
-          <th mat-header-cell *matHeaderCellDef>ACCIÓN</th>
-          <td mat-cell *matCellDef="let row">
-            <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'informacion-personal']">
-              <mat-icon>visibility</mat-icon>
-            </button>
-            <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'ubicacion']">
-              <mat-icon>folder_especial</mat-icon>
-            </button>
-            <button mat-icon-button [routerLink]="['/principal/legajo', 'edicion', row.iLegId]">
-              <mat-icon>edit</mat-icon>
-            </button>
-          </td>
-        </ng-container>
-
-        <tr mat-header-row *matHeaderRowDef="['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion'];"></tr>
-      </table>
+    <!-- Mensaje cuando no hay resultados -->
+    <div *ngIf="resultados.data.length === 0 && busquedaRealizada" 
+         class="text-center py-8">
+    
+      <p class="text-gray-600 text-lg">No hay resultados en la búsqueda</p>
     </div>
 
-    <mat-paginator
-      class="mt-4"
-      [length]="totalRegistros"
-      [pageSize]="tamanioPagina"
-      [pageSizeOptions]="[5, 10, 20]"
-      [pageIndex]="paginaActual"
-      [showFirstLastButtons]="true"
-      (page)="onPageChange($event)">
-    </mat-paginator>
+    <!-- Tabla (solo se muestra si hay resultados) -->
+    <ng-container *ngIf="resultados.data.length > 0">
+      <div class="overflow-x-auto">
+        <table mat-table [dataSource]="resultados" class="w-full min-w-[800px]">
+          <!-- N° Column -->
+          <ng-container matColumnDef="nro">
+            <th mat-header-cell *matHeaderCellDef>N°</th>
+            <td mat-cell *matCellDef="let row; let i = index">{{i + 1}}</td>
+          </ng-container>
+
+          <!-- Documento Column -->
+          <ng-container matColumnDef="documento">
+            <th mat-header-cell *matHeaderCellDef>DOCUMENTO</th>
+            <td mat-cell *matCellDef="let row">{{row.cLegNumeroDocumentoIdentida}}</td>
+          </ng-container>
+
+          <!-- Apellidos y Nombres Column -->
+          <ng-container matColumnDef="apellidosNombres">
+            <th mat-header-cell *matHeaderCellDef>APELLIDOS Y NOMBRES</th>
+            <td mat-cell *matCellDef="let row">{{row.cLegPrimerApellido}} {{row.cLegSegundoApellido}}, {{row.cLegNombres}}</td>
+          </ng-container>
+
+          <!-- Centro Laboral Column -->
+          <ng-container matColumnDef="centroLaboral">
+            <th mat-header-cell *matHeaderCellDef>CENTRO LABORAL</th>
+            <td mat-cell *matCellDef="let row">{{row.cCentLabNombre}}</td>
+          </ng-container>
+
+          <!-- Condición Laboral Column -->
+          <ng-container matColumnDef="condicionLaboral">
+            <th mat-header-cell *matHeaderCellDef>CONDICIÓN LABORAL</th>
+            <td mat-cell *matCellDef="let row">{{row.cCondLabNombre}}</td>
+          </ng-container>
+
+          <!-- Situación Laboral Column -->
+          <ng-container matColumnDef="situacionLaboral">
+            <th mat-header-cell *matHeaderCellDef>SITUACIÓN LABORAL</th>
+            <td mat-cell *matCellDef="let row">{{row.cSitLabNombre}}</td>
+          </ng-container>
+
+          <!-- Régimen Laboral Column -->
+          <ng-container matColumnDef="regimenLaboral">
+            <th mat-header-cell *matHeaderCellDef>RÉGIMEN LABORAL</th>
+            <td mat-cell *matCellDef="let row">{{row.cRegLabNombre}}</td>
+          </ng-container>
+
+          <!-- Acción Column -->
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef>ACCIÓN</th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'informacion-personal']">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button [routerLink]="['/principal/legajo', row.iLegId, 'ubicacion']">
+                <mat-icon>folder_especial</mat-icon>
+              </button>
+              <button mat-icon-button [routerLink]="['/principal/legajo', 'edicion', row.iLegId]">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['nro', 'documento', 'apellidosNombres', 'centroLaboral', 'condicionLaboral', 'situacionLaboral', 'regimenLaboral', 'accion'];"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        class="mt-4"
+        [length]="totalRegistros"
+        [pageSize]="tamanioPagina"
+        [pageSizeOptions]="[5, 10, 20]"
+        [pageIndex]="paginaActual"
+        [showFirstLastButtons]="true"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+    </ng-container>
   </mat-card-content>
 </mat-card>
 </form>

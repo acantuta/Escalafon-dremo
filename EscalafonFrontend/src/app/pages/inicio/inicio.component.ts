@@ -39,6 +39,7 @@ export class InicioComponent implements OnInit {
   totalRegistros: number = 0;
   tamanioPagina: number = 10;
   paginaActual: number = 0;
+  busquedaRealizada: boolean = false;
 
   constructor(
     private tipoDocumentoService: TipoDocumentoIdentificacionService,
@@ -208,12 +209,20 @@ export class InicioComponent implements OnInit {
         next: (response) => {
           this.resultados.data = response.data;
           this.totalRegistros = response.meta.total;
-          this.snackBar.open('Búsqueda realizada con éxito', 'Cerrar', {
+          this.busquedaRealizada = true;
+          
+          // Mensaje del snackbar según si hay resultados o no
+          const mensaje = response.data.length > 0 
+            ? 'Búsqueda realizada con éxito' 
+            : 'No hay resultados en la búsqueda';
+          
+          this.snackBar.open(mensaje, 'Cerrar', {
             duration: 3000
           });
         },
         error: (error) => {
           console.error('Error en la búsqueda:', error);
+          this.busquedaRealizada = true;
           this.snackBar.open('Error al realizar la búsqueda', 'Cerrar', {
             duration: 3000
           });
@@ -227,6 +236,7 @@ export class InicioComponent implements OnInit {
     this.instanciasGestionEducativa = [];
     this.resultados.data = [];
     this.totalRegistros = 0;
+    this.busquedaRealizada = false;
     this.snackBar.open('Formulario limpiado', 'Cerrar', {
       duration: 3000
     });
